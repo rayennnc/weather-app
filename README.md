@@ -1,97 +1,86 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# WeatherApp
 
-# Getting Started
+A weather app for Android, built with plain React Native (no Expo) and TypeScript. It shows current conditions, a 48-hour forecast and a 7-day forecast for your location or any city you search for, and keeps showing the last fetched data when you are offline.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+This is a portfolio project. It is not published to any app store.
 
-## Step 1: Start Metro
+[![CI](https://github.com/rayennnc/weather-app/actions/workflows/ci.yml/badge.svg)](https://github.com/rayennnc/REPO/weather-app/workflows/ci.yml)
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+> **Status:** work in progress. The repository foundation is in place (tooling, CI, base structure). Features are built milestone by milestone.
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Features
+
+Planned, and ticked off as they are built:
+
+- [ ] Current weather: temperature, condition, feels-like, humidity, wind and precipitation
+- [ ] Hourly forecast (next 48 hours) and daily forecast (7 days)
+- [ ] Device location with a city search fallback, plus saved locations
+- [ ] Unit settings (°C/°F, km/h or mph)
+- [ ] Offline support: the last data stays visible with a "last updated" label
+- [ ] Loading, error, empty and permission-denied states
+
+## Tech stack
+
+In place:
+
+- React Native 0.88 (Community CLI, New Architecture) and TypeScript (strict)
+- ESLint, Prettier and Jest
+- GitHub Actions (lint, type check, format check, test)
+
+Planned: React Navigation 7, TanStack Query, Zustand, Zod, React Native Testing Library.
+
+## Architecture
+
+MVVM with hooks, organized by feature:
+
+- **View**: screens and components, which only render and call callbacks
+- **ViewModel**: one custom hook per screen, which combines server state and UI state
+- **Model**: repository, API client, schema validation and mappers
+
+```text
+src/
+  app/          app shell: entry, navigation, providers
+  features/
+    weather/    data/ hooks/ ui/
+    search/
+    locations/
+    settings/
+  shared/       ui/ utils/ theme/ lib/ stores/
+```
+
+Folders are created as each feature is built; only `src/app` exists so far. Imports only flow in one direction: `shared` → `features` → `app`.
+
+## Getting started
+
+Prerequisites:
+
+- Node.js 22.11 or newer (CI uses 24 LTS)
+- JDK 17
+- Android Studio with Android SDK Platform 37, Build-Tools 37.0.0 and NDK 27.1.12297006
+- An Android emulator, or a device with USB debugging
+
+See the [React Native environment setup guide](https://reactnative.dev/docs/set-up-your-environment) for details.
 
 ```sh
-# Using npm
+npm ci
 npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
+# in a second terminal
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
+## Scripts
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+| Command                | Description                                          |
+| ---------------------- | ---------------------------------------------------- |
+| `npm start`            | Start the Metro development server                   |
+| `npm run android`      | Build and run the Android app                        |
+| `npm run check`        | Lint, type check, format check and test (same as CI) |
+| `npm run lint`         | Run ESLint                                           |
+| `npm run typecheck`    | Run the TypeScript compiler without emitting files   |
+| `npm run format:check` | Check formatting with Prettier                       |
+| `npm run format`       | Format all files with Prettier                       |
+| `npm test`             | Run Jest tests                                       |
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+## Data sources
 
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Weather data is provided by [Open-Meteo](https://open-meteo.com/). Place search uses the Open-Meteo Geocoding API (data from [GeoNames](https://www.geonames.org/)). Open-Meteo's free API is for non-commercial use and has rate limits, and its data is licensed under CC BY 4.0, so attribution is required. See their [terms](https://open-meteo.com/en/terms).
