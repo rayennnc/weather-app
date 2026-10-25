@@ -4,7 +4,7 @@ A weather app for Android, built with plain React Native (no Expo) and TypeScrip
 
 This is a portfolio project. It is not published to any app store.
 
-[![CI](https://github.com/rayennnc/weather-app/actions/workflows/ci.yml/badge.svg)](https://github.com/rayennnc/REPO/weather-app/workflows/ci.yml)
+[![CI](https://github.com/rayennnc/weather-app/actions/workflows/ci.yml/badge.svg)](https://github.com/rayennnc/weather-app/actions/workflows/ci.yml)
 
 > **Status:** work in progress. The repository foundation is in place (tooling, CI, base structure). Features are built milestone by milestone.
 
