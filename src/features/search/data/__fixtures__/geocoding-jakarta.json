@@ -1,0 +1,36 @@
+{
+  "results": [
+    {
+      "id": 1642911,
+      "name": "Jakarta",
+      "latitude": -6.21462,
+      "longitude": 106.84513,
+      "elevation": 16.0,
+      "feature_code": "PPLC",
+      "country_code": "ID",
+      "admin1_id": 1642907,
+      "timezone": "Asia/Jakarta",
+      "population": 8540121,
+      "country_id": 1643084,
+      "country": "Indonesia",
+      "admin1": "Jakarta Special Capital Region"
+    },
+    {
+      "id": 6754874,
+      "name": "Jakarta Pusat",
+      "latitude": -6.1818,
+      "longitude": 106.8223,
+      "elevation": 17.0,
+      "feature_code": "PPLX",
+      "country_code": "ID",
+      "admin1_id": 1642907,
+      "admin2_id": 1642908,
+      "timezone": "Asia/Jakarta",
+      "country_id": 1643084,
+      "country": "Indonesia",
+      "admin1": "Jakarta Special Capital Region",
+      "admin2": "Central Jakarta"
+    }
+  ],
+  "generationtime_ms": 0.105023384
+}
