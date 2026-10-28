@@ -6,7 +6,7 @@ This is a portfolio project. It is not published to any app store.
 
 [![CI](https://github.com/rayennnc/weather-app/actions/workflows/ci.yml/badge.svg)](https://github.com/rayennnc/weather-app/actions/workflows/ci.yml)
 
-> **Status:** work in progress. The repository foundation is in place (tooling, CI, base structure). Features are built milestone by milestone.
+> **Status:** work in progress. The foundation (tooling, CI) and the data layer (Open-Meteo client, validation, mappers, repositories, tests) are in place. The UI is next. Features are built milestone by milestone.
 
 ## Features
 
@@ -25,9 +25,10 @@ In place:
 
 - React Native 0.88 (Community CLI, New Architecture) and TypeScript (strict)
 - ESLint, Prettier and Jest
+- Zod for validating API responses
 - GitHub Actions (lint, type check, format check, test)
 
-Planned: React Navigation 7, TanStack Query, Zustand, Zod, React Native Testing Library.
+Planned: React Navigation 7, TanStack Query, Zustand, React Native Testing Library.
 
 ## Architecture
 
@@ -48,7 +49,7 @@ src/
   shared/       ui/ utils/ theme/ lib/ stores/
 ```
 
-Folders are created as each feature is built; only `src/app` exists so far. Imports only flow in one direction: `shared` → `features` → `app`.
+Folders are created as each feature is built. So far the data layer exists (`features/weather/data`, `features/search/data`, `shared/lib`, `shared/utils`); screens and hooks come next. Imports only flow in one direction: `shared` → `features` → `app`.
 
 ## Getting started
 
@@ -84,3 +85,7 @@ npm run android
 ## Data sources
 
 Weather data is provided by [Open-Meteo](https://open-meteo.com/). Place search uses the Open-Meteo Geocoding API (data from [GeoNames](https://www.geonames.org/)). Open-Meteo's free API is for non-commercial use and has rate limits, and its data is licensed under CC BY 4.0, so attribution is required. See their [terms](https://open-meteo.com/en/terms).
+
+## Known limitations
+
+- **Daylight saving time.** Open-Meteo returns times with one fixed UTC offset per response, so in cities that observe DST the hour labels can be off by one hour after a DST change. Indonesia has no DST, so the main use case is not affected.
