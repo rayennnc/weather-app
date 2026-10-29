@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 // One client for the whole app. A forecast barely changes within a few
 // minutes, so data newer than staleTime is not refetched on every mount.
-const appQueryClient = new QueryClient({
+export const appQueryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000,
