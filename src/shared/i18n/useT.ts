@@ -9,6 +9,8 @@ export function t(key: MessageKey, params: Params = {}): string {
   );
 }
 
+export type Translate = typeof t;
+
 // components call useT() instead of importing t, so a language setting can be
 // added later by changing only this hook
 export function useT() {

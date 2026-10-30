@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useT } from '../../../shared/i18n/useT';
-import { formatTemperature } from '../../../shared/utils/formatTemperature';
-import type { WeatherCondition } from '../../../shared/utils/weatherCode';
 import { getForecast } from '../data/weatherRepository';
 import { getErrorMessageKey } from './errorMessage';
+import { type ForecastView, toForecastView } from './forecastView';
 
 // fixed location for now. M4 replaces this with the active saved location
 const LOCATION_NAME = 'Jakarta';
@@ -18,17 +17,7 @@ const PARAMS = {
 export type WeatherScreenState =
   | { status: 'loading' }
   | { status: 'error'; message: string; retry: () => void }
-  | {
-      status: 'success';
-      location: string;
-      current: {
-        condition: WeatherCondition;
-        isDay: boolean;
-        temperature: string;
-        conditionText: string;
-        feelsLike: string;
-      };
-    };
+  | ({ status: 'success'; location: string } & ForecastView);
 
 export function useWeatherViewModel(): WeatherScreenState {
   const t = useT();
@@ -40,19 +29,10 @@ export function useWeatherViewModel(): WeatherScreenState {
 
   // data wins over error: if a refresh fails we keep the last forecast on screen
   if (query.data) {
-    const { current } = query.data;
     return {
       status: 'success',
       location: LOCATION_NAME,
-      current: {
-        condition: current.condition,
-        isDay: current.isDay,
-        temperature: formatTemperature(current.temperature),
-        conditionText: t(`condition.${current.condition}`),
-        feelsLike: t('weather.feelsLike', {
-          temperature: formatTemperature(current.apparentTemperature),
-        }),
-      },
+      ...toForecastView(query.data, t),
     };
   }
 

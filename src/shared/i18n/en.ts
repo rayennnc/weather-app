@@ -4,6 +4,18 @@ export const en = {
   'weather.loading': 'Loading weather…',
   'weather.retry': 'Try again',
   'weather.feelsLike': 'Feels like {temperature}',
+  'weather.now': 'Now',
+  'weather.today': 'Today',
+  'weather.hourlyTitle': 'Next 48 hours',
+  'weather.dailyTitle': '7-day forecast',
+
+  'weekday.sun': 'Sun',
+  'weekday.mon': 'Mon',
+  'weekday.tue': 'Tue',
+  'weekday.wed': 'Wed',
+  'weekday.thu': 'Thu',
+  'weekday.fri': 'Fri',
+  'weekday.sat': 'Sat',
 
   'error.network': 'No internet connection. Check it and try again.',
   'error.timeout':
