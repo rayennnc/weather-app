@@ -1,17 +1,21 @@
 import {
   ActivityIndicator,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useT } from '../../../shared/i18n/useT';
+import { colors } from '../../../shared/theme/colors';
 import {
   useWeatherViewModel,
   type WeatherScreenState,
 } from '../hooks/useWeatherViewModel';
-import { WeatherIcon } from './WeatherIcon';
+import { CurrentWeather } from './CurrentWeather';
+import { DailyForecast } from './DailyForecast';
+import { HourlyForecast } from './HourlyForecast';
 
 export function WeatherScreen() {
   const state = useWeatherViewModel();
@@ -49,17 +53,11 @@ function WeatherContent({ state }: { state: WeatherScreenState }) {
       );
     case 'success':
       return (
-        <View style={styles.center}>
-          <Text style={styles.location}>{state.location}</Text>
-          <WeatherIcon
-            condition={state.current.condition}
-            isDay={state.current.isDay}
-            size={96}
-          />
-          <Text style={styles.temperature}>{state.current.temperature}</Text>
-          <Text style={styles.condition}>{state.current.conditionText}</Text>
-          <Text style={styles.secondary}>{state.current.feelsLike}</Text>
-        </View>
+        <ScrollView contentContainerStyle={styles.scroll}>
+          <CurrentWeather location={state.location} current={state.current} />
+          <HourlyForecast hours={state.hourly} />
+          <DailyForecast days={state.daily} />
+        </ScrollView>
       );
   }
 }
@@ -67,7 +65,7 @@ function WeatherContent({ state }: { state: WeatherScreenState }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#EEF3F8',
+    backgroundColor: colors.background,
   },
   center: {
     flex: 1,
@@ -76,37 +74,27 @@ const styles = StyleSheet.create({
     padding: 24,
     gap: 12,
   },
-  location: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  temperature: {
-    fontSize: 72,
-    fontWeight: '300',
-    color: '#111827',
-  },
-  condition: {
-    fontSize: 22,
-    color: '#111827',
+  scroll: {
+    padding: 16,
+    gap: 16,
   },
   secondary: {
     fontSize: 16,
-    color: '#4B5563',
+    color: colors.textSecondary,
   },
   message: {
     fontSize: 16,
-    color: '#111827',
+    color: colors.text,
     textAlign: 'center',
   },
   button: {
-    backgroundColor: '#2563EB',
+    backgroundColor: colors.accent,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: colors.onAccent,
     fontSize: 16,
     fontWeight: '600',
   },

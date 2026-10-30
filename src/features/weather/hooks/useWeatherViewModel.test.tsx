@@ -24,8 +24,27 @@ const forecast: Forecast = {
     windSpeed: 9.4,
     windDirection: 180,
   },
-  hourly: [],
-  daily: [],
+  hourly: [
+    {
+      time: '2026-10-28T14:00',
+      temperature: 30.6,
+      precipitationProbability: 40,
+      condition: 'partlyCloudy',
+      isDay: true,
+    },
+  ],
+  daily: [
+    {
+      date: '2026-10-28',
+      condition: 'rain',
+      temperatureMax: 32.2,
+      temperatureMin: 24.6,
+      precipitationProbabilityMax: 80,
+      sunrise: '2026-10-28T05:41',
+      sunset: '2026-10-28T17:52',
+      uvIndexMax: 11,
+    },
+  ],
 };
 
 // a fresh client per test. no retry, and no gc timer so Jest can exit
@@ -59,7 +78,7 @@ test('turns the forecast into display-ready values', async () => {
   const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
 
   await waitFor(() => expect(result.current.status).toBe('success'));
-  expect(result.current).toEqual({
+  expect(result.current).toMatchObject({
     status: 'success',
     location: 'Jakarta',
     current: {
@@ -69,6 +88,8 @@ test('turns the forecast into display-ready values', async () => {
       conditionText: 'Partly cloudy',
       feelsLike: 'Feels like 34°',
     },
+    hourly: [{ label: 'Now', temperature: '31°' }],
+    daily: [{ label: 'Today', temperatureMax: '32°' }],
   });
 });
 

@@ -30,7 +30,7 @@ test('shows the error message and retries when the button is pressed', async () 
   expect(retry).toHaveBeenCalledTimes(1);
 });
 
-test('shows the current weather', async () => {
+test('shows the current weather, the hours and the days', async () => {
   mockViewModel.mockReturnValue({
     status: 'success',
     location: 'Jakarta',
@@ -41,6 +41,26 @@ test('shows the current weather', async () => {
       conditionText: 'Partly cloudy',
       feelsLike: 'Feels like 34°',
     },
+    hourly: [
+      {
+        time: '2026-10-28T14:00',
+        label: 'Now',
+        condition: 'partlyCloudy',
+        isDay: true,
+        temperature: '30°',
+        precipitationChance: '40%',
+      },
+    ],
+    daily: [
+      {
+        date: '2026-10-28',
+        label: 'Today',
+        condition: 'rain',
+        temperatureMax: '32°',
+        temperatureMin: '25°',
+        precipitationChance: '80%',
+      },
+    ],
   });
 
   await render(<WeatherScreen />);
@@ -49,4 +69,6 @@ test('shows the current weather', async () => {
   expect(screen.getByText('31°')).toBeOnTheScreen();
   expect(screen.getByText('Partly cloudy')).toBeOnTheScreen();
   expect(screen.getByText('Feels like 34°')).toBeOnTheScreen();
+  expect(screen.getByText('Now')).toBeOnTheScreen();
+  expect(screen.getByText('Today')).toBeOnTheScreen();
 });
