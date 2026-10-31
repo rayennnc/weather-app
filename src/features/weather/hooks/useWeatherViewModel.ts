@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { useT } from '../../../shared/i18n/useT';
 import { getForecast } from '../data/weatherRepository';
 import { getErrorMessageKey } from './errorMessage';
@@ -17,7 +18,12 @@ const PARAMS = {
 export type WeatherScreenState =
   | { status: 'loading' }
   | { status: 'error'; message: string; retry: () => void }
-  | ({ status: 'success'; location: string } & ForecastView);
+  | ({
+      status: 'success';
+      location: string;
+      isRefreshing: boolean;
+      refresh: () => void;
+    } & ForecastView);
 
 export function useWeatherViewModel(): WeatherScreenState {
   const t = useT();
@@ -27,12 +33,25 @@ export function useWeatherViewModel(): WeatherScreenState {
     queryFn: ({ signal }) => getForecast(PARAMS, signal),
   });
 
+  // pull-to-refresh has its own flag: isFetching would also be true for the
+  // refetches that happen quietly in the background
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  function refresh() {
+    setIsRefreshing(true);
+    query.refetch().finally(() => setIsRefreshing(false));
+  }
+
   // data wins over error: if a refresh fails we keep the last forecast on screen
   if (query.data) {
     return {
       status: 'success',
       location: LOCATION_NAME,
-      ...toForecastView(query.data, t),
+      isRefreshing,
+      refresh,
+      ...toForecastView(query.data, t, {
+        updatedAt: query.dataUpdatedAt,
+        windSpeedUnit: PARAMS.windSpeedUnit,
+      }),
     };
   }
 

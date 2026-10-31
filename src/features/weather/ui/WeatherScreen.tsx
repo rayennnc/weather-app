@@ -1,6 +1,6 @@
 import {
-  ActivityIndicator,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,7 +15,9 @@ import {
 } from '../hooks/useWeatherViewModel';
 import { CurrentWeather } from './CurrentWeather';
 import { DailyForecast } from './DailyForecast';
+import { DetailsCard } from './DetailsCard';
 import { HourlyForecast } from './HourlyForecast';
+import { WeatherSkeleton } from './WeatherSkeleton';
 
 export function WeatherScreen() {
   const state = useWeatherViewModel();
@@ -32,12 +34,7 @@ function WeatherContent({ state }: { state: WeatherScreenState }) {
 
   switch (state.status) {
     case 'loading':
-      return (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" />
-          <Text style={styles.secondary}>{t('weather.loading')}</Text>
-        </View>
-      );
+      return <WeatherSkeleton />;
     case 'error':
       return (
         <View style={styles.center}>
@@ -53,10 +50,24 @@ function WeatherContent({ state }: { state: WeatherScreenState }) {
       );
     case 'success':
       return (
-        <ScrollView contentContainerStyle={styles.scroll}>
-          <CurrentWeather location={state.location} current={state.current} />
+        <ScrollView
+          testID="weather-scroll"
+          contentContainerStyle={styles.scroll}
+          refreshControl={
+            <RefreshControl
+              refreshing={state.isRefreshing}
+              onRefresh={state.refresh}
+            />
+          }
+        >
+          <CurrentWeather
+            location={state.location}
+            current={state.current}
+            updated={state.updated}
+          />
           <HourlyForecast hours={state.hourly} />
           <DailyForecast days={state.daily} />
+          <DetailsCard details={state.details} />
         </ScrollView>
       );
   }
@@ -77,10 +88,6 @@ const styles = StyleSheet.create({
   scroll: {
     padding: 16,
     gap: 16,
-  },
-  secondary: {
-    fontSize: 16,
-    color: colors.textSecondary,
   },
   message: {
     fontSize: 16,

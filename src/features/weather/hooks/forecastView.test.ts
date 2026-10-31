@@ -56,8 +56,14 @@ const forecast: Forecast = {
   ],
 };
 
+// 04:51 UTC, which is 11:51 in Jakarta (+7)
+const options = {
+  updatedAt: Date.UTC(2026, 9, 28, 4, 51),
+  windSpeedUnit: 'kmh',
+} as const;
+
 describe('toForecastView', () => {
-  const view = toForecastView(forecast, t);
+  const view = toForecastView(forecast, t, options);
 
   test('formats the current weather', () => {
     expect(view.current).toEqual({
@@ -98,8 +104,53 @@ describe('toForecastView', () => {
     expect(view.daily[1].precipitationChance).toBeNull();
   });
 
+  test('shows when the data was last updated, on the location clock', () => {
+    expect(view.updated).toBe('Updated 11:51');
+  });
+
+  test('builds the details of the current weather and today', () => {
+    expect(view.details).toEqual([
+      { id: 'humidity', label: 'Humidity', value: '70%' },
+      { id: 'wind', label: 'Wind', value: '9 km/h' },
+      { id: 'precipitation', label: 'Precipitation', value: '0 mm' },
+      { id: 'uv', label: 'UV index', value: '11' },
+      { id: 'sunrise', label: 'Sunrise', value: '05:41' },
+      { id: 'sunset', label: 'Sunset', value: '17:52' },
+    ]);
+  });
+
+  test('uses the requested wind speed unit', () => {
+    const mph = toForecastView(forecast, t, {
+      ...options,
+      windSpeedUnit: 'mph',
+    });
+
+    expect(mph.details.find(detail => detail.id === 'wind')?.value).toBe(
+      '9 mph',
+    );
+  });
+
+  test('shows a dash when today has no UV index or no daily entry', () => {
+    const noUv = toForecastView(
+      { ...forecast, daily: [{ ...forecast.daily[0], uvIndexMax: null }] },
+      t,
+      options,
+    );
+    const noDay = toForecastView({ ...forecast, daily: [] }, t, options);
+
+    expect(noUv.details.find(detail => detail.id === 'uv')?.value).toBe('–');
+    expect(noDay.details.find(detail => detail.id === 'sunrise')?.value).toBe(
+      '–',
+    );
+    expect(noDay.details.find(detail => detail.id === 'uv')?.value).toBe('–');
+  });
+
   test('handles empty lists', () => {
-    const empty = toForecastView({ ...forecast, hourly: [], daily: [] }, t);
+    const empty = toForecastView(
+      { ...forecast, hourly: [], daily: [] },
+      t,
+      options,
+    );
 
     expect(empty.hourly).toEqual([]);
     expect(empty.daily).toEqual([]);
