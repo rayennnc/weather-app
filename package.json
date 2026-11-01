@@ -14,12 +14,14 @@
     "check": "npm run lint && npm run typecheck && npm run format:check && npm test"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^3.1.1",
     "@react-native/new-app-screen": "0.88.0",
     "@tanstack/react-query": "^5.105.0",
     "react": "19.3.0",
     "react-native": "0.88.0",
     "react-native-safe-area-context": "^5.5.2",
-    "zod": "^4.6.7"
+    "zod": "^4.6.7",
+    "zustand": "^5.0.16"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
