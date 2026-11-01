@@ -1,4 +1,4 @@
-import { formatWindSpeed } from './formatWindspeed';
+import { formatWindSpeed } from './formatWindSpeed';
 
 describe('formatWindSpeed', () => {
   test('rounds and adds km/h', () => {
