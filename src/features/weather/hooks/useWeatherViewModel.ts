@@ -1,18 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useT } from '../../../shared/i18n/useT';
+import { useLocationStore } from '../../../shared/stores/locationStore';
 import { getForecast } from '../data/weatherRepository';
 import { getErrorMessageKey } from './errorMessage';
 import { type ForecastView, toForecastView } from './forecastView';
 
-// fixed location for now. M4 replaces this with the active saved location
-const LOCATION_NAME = 'Jakarta';
-const PARAMS = {
-  latitude: -6.2146,
-  longitude: 106.8451,
-  temperatureUnit: 'celsius',
-  windSpeedUnit: 'kmh',
-} as const;
+// units are fixed until the settings screen (M5)
+const UNITS = { temperatureUnit: 'celsius', windSpeedUnit: 'kmh' } as const;
 
 // what the screen can be in. the screen never sees the raw forecast
 export type WeatherScreenState =
@@ -27,10 +22,21 @@ export type WeatherScreenState =
 
 export function useWeatherViewModel(): WeatherScreenState {
   const t = useT();
+  const activeLocation = useLocationStore(state => state.activeLocation);
+  const hasHydrated = useLocationStore(state => state.hasHydrated);
+  const params = {
+    latitude: activeLocation.latitude,
+    longitude: activeLocation.longitude,
+    ...UNITS,
+  };
   const query = useQuery({
-    // everything the request depends on goes in the key
-    queryKey: ['forecast', PARAMS],
-    queryFn: ({ signal }) => getForecast(PARAMS, signal),
+    // everything the request depends on goes in the key, so a new location
+    // means a new request
+    queryKey: ['forecast', params],
+    queryFn: ({ signal }) => getForecast(params, signal),
+    // wait for the saved location, or we would fetch Jakarta first and then
+    // the real one
+    enabled: hasHydrated,
   });
 
   // pull-to-refresh has its own flag: isFetching would also be true for the
@@ -45,12 +51,12 @@ export function useWeatherViewModel(): WeatherScreenState {
   if (query.data) {
     return {
       status: 'success',
-      location: LOCATION_NAME,
+      location: activeLocation.name,
       isRefreshing,
       refresh,
       ...toForecastView(query.data, t, {
         updatedAt: query.dataUpdatedAt,
-        windSpeedUnit: PARAMS.windSpeedUnit,
+        windSpeedUnit: UNITS.windSpeedUnit,
       }),
     };
   }

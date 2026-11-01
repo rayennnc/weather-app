@@ -1,5 +1,5 @@
 import { GeocodingResponse } from './geocodingSchema';
-import { Place } from './place';
+import { Place } from '../../../shared/types/place';
 
 export function mapGeocoding(response: GeocodingResponse): Place[] {
   return (response.results ?? []).map(result => ({

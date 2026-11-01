@@ -3,6 +3,11 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import { t } from '../../../shared/i18n/useT';
 import { NetworkError } from '../../../shared/lib/errors';
+import {
+  DEFAULT_LOCATION,
+  useLocationStore,
+} from '../../../shared/stores/locationStore';
+import type { Place } from '../../../shared/types/place';
 import { getForecast } from '../data/weatherRepository';
 import type { Forecast } from '../data/forecast';
 import { useWeatherViewModel } from './useWeatherViewModel';
@@ -58,8 +63,23 @@ function setup() {
   return { client, wrapper };
 }
 
+const bandung: Place = {
+  id: 1650357,
+  name: 'Bandung',
+  region: 'West Java',
+  country: 'Indonesia',
+  latitude: -6.9175,
+  longitude: 107.6191,
+};
+
 beforeEach(() => {
   mockGetForecast.mockReset();
+  // the saved location is already read, unless a test says otherwise
+  useLocationStore.setState({
+    activeLocation: DEFAULT_LOCATION,
+    savedLocations: [DEFAULT_LOCATION],
+    hasHydrated: true,
+  });
 });
 
 test('starts in the loading state', async () => {
@@ -97,7 +117,8 @@ test('turns the forecast into display-ready values', async () => {
   });
 });
 
-test('asks for Jakarta in metric units and passes the abort signal on', async () => {
+test('asks for the active location in metric units and passes the abort signal on', async () => {
+  useLocationStore.setState({ activeLocation: bandung });
   mockGetForecast.mockResolvedValue(forecast);
   const { wrapper } = setup();
 
@@ -107,11 +128,51 @@ test('asks for Jakarta in metric units and passes the abort signal on', async ()
   expect(mockGetForecast).toHaveBeenCalledTimes(1);
   expect(mockGetForecast).toHaveBeenCalledWith(
     {
-      latitude: -6.2146,
-      longitude: 106.8451,
+      latitude: bandung.latitude,
+      longitude: bandung.longitude,
       temperatureUnit: 'celsius',
       windSpeedUnit: 'kmh',
     },
+    expect.any(AbortSignal),
+  );
+  expect(result.current).toMatchObject({ location: 'Bandung' });
+});
+
+test('waits for the saved location before it fetches', async () => {
+  useLocationStore.setState({ hasHydrated: false });
+  mockGetForecast.mockResolvedValue(forecast);
+  const { wrapper } = setup();
+
+  const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
+  expect(result.current).toEqual({ status: 'loading' });
+  expect(mockGetForecast).not.toHaveBeenCalled();
+
+  await act(async () => {
+    useLocationStore.setState({ hasHydrated: true });
+  });
+
+  await waitFor(() => expect(result.current.status).toBe('success'));
+  expect(mockGetForecast).toHaveBeenCalledTimes(1);
+});
+
+test('fetches the new location when the active location changes', async () => {
+  mockGetForecast.mockResolvedValue(forecast);
+  const { wrapper } = setup();
+  const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
+  await waitFor(() =>
+    expect(result.current).toMatchObject({ location: 'Jakarta' }),
+  );
+
+  await act(async () => {
+    useLocationStore.getState().selectLocation(bandung);
+  });
+
+  await waitFor(() =>
+    expect(result.current).toMatchObject({ location: 'Bandung' }),
+  );
+  expect(mockGetForecast).toHaveBeenCalledTimes(2);
+  expect(mockGetForecast).toHaveBeenLastCalledWith(
+    expect.objectContaining({ latitude: bandung.latitude }),
     expect.any(AbortSignal),
   );
 });
