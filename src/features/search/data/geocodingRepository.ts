@@ -2,7 +2,7 @@ import { InvalidResponseError } from '../../../shared/lib/errors';
 import { fetchJson } from '../../../shared/lib/http';
 import { mapGeocoding } from './geocodingMapper';
 import { geocodingResponseSchema } from './geocodingSchema';
-import { Place } from './place';
+import { Place } from '../../../shared/types/place';
 
 const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const RESULT_COUNT = 10;
