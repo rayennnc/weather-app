@@ -6,4 +6,5 @@ export const colors = {
   textSecondary: '#4B5563',
   accent: '#2563EB',
   onAccent: '#FFFFFF',
+  skeleton: '#D5DEE8',
 };

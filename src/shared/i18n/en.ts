@@ -8,6 +8,15 @@ export const en = {
   'weather.today': 'Today',
   'weather.hourlyTitle': 'Next 48 hours',
   'weather.dailyTitle': '7-day forecast',
+  'weather.detailsTitle': 'Details',
+  'weather.updated': 'Updated {time}',
+
+  'detail.humidity': 'Humidity',
+  'detail.wind': 'Wind',
+  'detail.precipitation': 'Precipitation',
+  'detail.uv': 'UV index',
+  'detail.sunrise': 'Sunrise',
+  'detail.sunset': 'Sunset',
 
   'weekday.sun': 'Sun',
   'weekday.mon': 'Mon',

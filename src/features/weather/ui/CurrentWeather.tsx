@@ -6,9 +6,10 @@ import { WeatherIcon } from './WeatherIcon';
 type Props = {
   location: string;
   current: CurrentView;
+  updated: string;
 };
 
-export function CurrentWeather({ location, current }: Props) {
+export function CurrentWeather({ location, current, updated }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.location}>{location}</Text>
@@ -20,6 +21,7 @@ export function CurrentWeather({ location, current }: Props) {
       <Text style={styles.temperature}>{current.temperature}</Text>
       <Text style={styles.condition}>{current.conditionText}</Text>
       <Text style={styles.secondary}>{current.feelsLike}</Text>
+      <Text style={styles.updated}>{updated}</Text>
     </View>
   );
 }
@@ -46,6 +48,10 @@ const styles = StyleSheet.create({
   },
   secondary: {
     fontSize: 16,
+    color: colors.textSecondary,
+  },
+  updated: {
+    fontSize: 12,
     color: colors.textSecondary,
   },
 });

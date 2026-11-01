@@ -20,5 +20,5 @@ test('shows the weather screen', async () => {
 
   await render(<App />);
 
-  expect(screen.getByText(t('weather.loading'))).toBeOnTheScreen();
+  expect(screen.getByLabelText(t('weather.loading'))).toBeOnTheScreen();
 });

@@ -88,8 +88,12 @@ test('turns the forecast into display-ready values', async () => {
       conditionText: 'Partly cloudy',
       feelsLike: 'Feels like 34°',
     },
+    updated: expect.stringMatching(/^Updated \d{2}:\d{2}$/),
     hourly: [{ label: 'Now', temperature: '31°' }],
     daily: [{ label: 'Today', temperatureMax: '32°' }],
+    details: expect.arrayContaining([
+      expect.objectContaining({ id: 'wind', value: '9 km/h' }),
+    ]),
   });
 });
 
@@ -160,4 +164,35 @@ test('keeps showing the last forecast when a refresh fails', async () => {
 
   expect(mockGetForecast).toHaveBeenCalledTimes(2);
   expect(result.current.status).toBe('success');
+});
+
+test('refresh turns isRefreshing on until the new forecast is in', async () => {
+  let finish: (value: Forecast) => void = () => {};
+  mockGetForecast.mockResolvedValueOnce(forecast).mockReturnValueOnce(
+    new Promise<Forecast>(resolve => {
+      finish = resolve;
+    }),
+  );
+  const { wrapper } = setup();
+  const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
+  await waitFor(() => expect(result.current.status).toBe('success'));
+  expect(result.current).toMatchObject({ isRefreshing: false });
+
+  if (result.current.status !== 'success') {
+    throw new Error('expected the success state');
+  }
+  const { refresh } = result.current;
+  await act(async () => {
+    refresh();
+  });
+  expect(result.current).toMatchObject({ isRefreshing: true });
+
+  await act(async () => {
+    finish(forecast);
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
+  });
+  await waitFor(() =>
+    expect(result.current).toMatchObject({ isRefreshing: false }),
+  );
+  expect(mockGetForecast).toHaveBeenCalledTimes(2);
 });
