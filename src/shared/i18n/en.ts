@@ -10,6 +10,14 @@ export const en = {
   'weather.dailyTitle': '7-day forecast',
   'weather.detailsTitle': 'Details',
   'weather.updated': 'Updated {time}',
+  'weather.search': 'Search',
+
+  'search.title': 'Search city',
+  'search.placeholder': 'Search for a city',
+  'search.hint': 'Type at least {count} letters to search',
+  'search.loading': 'Searching...',
+  'search.empty': 'No cities found for "{query}"',
+  'search.retry': 'Try again',
 
   'detail.humidity': 'Humidity',
   'detail.wind': 'Wind',
