@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useT } from '../../../shared/i18n/useT';
+import { getErrorMessageKey } from '../../../shared/lib/errorMessage';
 import { useLocationStore } from '../../../shared/stores/locationStore';
 import { getForecast } from '../data/weatherRepository';
-import { getErrorMessageKey } from './errorMessage';
 import { type ForecastView, toForecastView } from './forecastView';
 
 // units are fixed until the settings screen (M5)

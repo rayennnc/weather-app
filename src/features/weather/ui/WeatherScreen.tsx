@@ -19,11 +19,26 @@ import { DetailsCard } from './DetailsCard';
 import { HourlyForecast } from './HourlyForecast';
 import { WeatherSkeleton } from './WeatherSkeleton';
 
-export function WeatherScreen() {
+type Props = {
+  onSearchPress: () => void;
+};
+
+export function WeatherScreen({ onSearchPress }: Props) {
+  const t = useT();
   const state = useWeatherViewModel();
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* outside weather content, so a failed forecast still let user search for another city */}
+      <View style={styles.topBar}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onSearchPress}
+          style={styles.searchButton}
+        >
+          <Text style={styles.searchButtonText}>{t('weather.search')}</Text>
+        </Pressable>
+      </View>
       <WeatherContent state={state} />
     </SafeAreaView>
   );
@@ -77,6 +92,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  topBar: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  searchButton: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    backgroundColor: colors.card,
+  },
+  searchButtonText: {
+    color: colors.accent,
+    fontSize: 16,
+    fontWeight: '600',
   },
   center: {
     flex: 1,
