@@ -1,8 +1,4 @@
-import {
-  HttpError,
-  InvalidResponseError,
-  NetworkError,
-} from '../../../shared/lib/errors';
+import { HttpError, InvalidResponseError, NetworkError } from './errors';
 import { getErrorMessageKey } from './errorMessage';
 
 test.each([

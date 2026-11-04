@@ -1,9 +1,5 @@
-import type { MessageKey } from '../../../shared/i18n/en';
-import {
-  HttpError,
-  InvalidResponseError,
-  NetworkError,
-} from '../../../shared/lib/errors';
+import type { MessageKey } from '../i18n/en';
+import { HttpError, InvalidResponseError, NetworkError } from './errors';
 
 export function getErrorMessageKey(error: unknown): MessageKey {
   if (error instanceof NetworkError) {
