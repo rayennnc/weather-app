@@ -1,4 +1,4 @@
-import type { Place } from '../../../shared/types/place';
+import type { Place } from '../types/place';
 import { toPlaceView } from './placeView';
 
 const bandung: Place = {

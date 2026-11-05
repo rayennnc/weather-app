@@ -39,13 +39,13 @@ const results: SearchState = {
 
 test('shows the hint while there is not enough text', async () => {
   mockViewModel.mockReturnValue(
-    viewModel({ status: 'idle', hint: 'Type at least 2 letters to search.' }),
+    viewModel({ status: 'idle', hint: 'Type at least 3 letters to search.' }),
   );
 
   await render(<SearchScreen onPlaceSelected={jest.fn()} />);
 
   expect(
-    screen.getByText('Type at least 2 letters to search.'),
+    screen.getByText('Type at least 3 letters to search.'),
   ).toBeOnTheScreen();
 });
 

@@ -11,6 +11,7 @@ export const en = {
   'weather.detailsTitle': 'Details',
   'weather.updated': 'Updated {time}',
   'weather.search': 'Search',
+  'weather.locations': 'Locations',
 
   'search.title': 'Search city',
   'search.placeholder': 'Search for a city',
@@ -18,6 +19,12 @@ export const en = {
   'search.loading': 'Searching...',
   'search.empty': 'No cities found for "{query}"',
   'search.retry': 'Try again',
+
+  'locations.title': 'Locations',
+  'locations.add': 'Add city',
+  'locations.active': 'Active',
+  'locations.remove': 'Remove',
+  'locations.removeLabel': 'Remove {name}',
 
   'detail.humidity': 'Humidity',
   'detail.wind': 'Wind',

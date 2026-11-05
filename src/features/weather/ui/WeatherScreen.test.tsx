@@ -1,10 +1,22 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import type { ComponentProps } from 'react';
 import { t } from '../../../shared/i18n/useT';
 import {
   useWeatherViewModel,
   type WeatherScreenState,
 } from '../hooks/useWeatherViewModel';
 import { WeatherScreen } from './WeatherScreen';
+
+const renderScreen = (
+  props: Partial<ComponentProps<typeof WeatherScreen>> = {},
+) =>
+  render(
+    <WeatherScreen
+      onLocationsPress={jest.fn()}
+      onSearchPress={jest.fn()}
+      {...props}
+    />,
+  );
 
 // the screen only draws what the view model gives it, so the view model is mocked
 jest.mock('../hooks/useWeatherViewModel');
@@ -52,7 +64,7 @@ const success: WeatherScreenState = {
 test('shows the loading skeleton', async () => {
   mockViewModel.mockReturnValue({ status: 'loading' });
 
-  await render(<WeatherScreen onSearchPress={jest.fn()} />);
+  await renderScreen();
 
   expect(screen.getByLabelText(t('weather.loading'))).toBeOnTheScreen();
 });
@@ -65,7 +77,7 @@ test('shows the error message and retries when the button is pressed', async () 
     retry,
   });
 
-  await render(<WeatherScreen onSearchPress={jest.fn()} />);
+  await renderScreen();
   expect(screen.getByText('No internet')).toBeOnTheScreen();
   await fireEvent.press(screen.getByText(t('weather.retry')));
 
@@ -75,7 +87,7 @@ test('shows the error message and retries when the button is pressed', async () 
 test('shows the current weather, the hours, the days and the details', async () => {
   mockViewModel.mockReturnValue(success);
 
-  await render(<WeatherScreen onSearchPress={jest.fn()} />);
+  await renderScreen();
 
   expect(screen.getByText('Jakarta')).toBeOnTheScreen();
   expect(screen.getByText('31°')).toBeOnTheScreen();
@@ -92,7 +104,7 @@ test('pulling down calls refresh', async () => {
   const refresh = jest.fn();
   mockViewModel.mockReturnValue({ ...success, refresh });
 
-  await render(<WeatherScreen onSearchPress={jest.fn()} />);
+  await renderScreen();
   const { refreshControl } = screen.getByTestId('weather-scroll').props;
   await act(async () => {
     refreshControl.props.onRefresh();
@@ -104,27 +116,30 @@ test('pulling down calls refresh', async () => {
 test('shows the spinner while refreshing', async () => {
   mockViewModel.mockReturnValue({ ...success, isRefreshing: true });
 
-  await render(<WeatherScreen onSearchPress={jest.fn()} />);
+  await renderScreen();
   const { refreshControl } = screen.getByTestId('weather-scroll').props;
 
   expect(refreshControl.props.refreshing).toBe(true);
 });
 
-const statesWithTheButton: [string, WeatherScreenState][] = [
+const statesWithTheButtons: [string, WeatherScreenState][] = [
   ['the skeleton', { status: 'loading' }],
   ['an error', { status: 'error', message: 'No internet', retry: jest.fn() }],
   ['the forecast', success],
 ];
 
-test.each(statesWithTheButton)(
-  'the search button is there and works while showing %s',
+test.each(statesWithTheButtons)(
+  'the search and locations buttons are there and work while showing %s',
   async (_name, state) => {
     const onSearchPress = jest.fn();
+    const onLocationsPress = jest.fn();
     mockViewModel.mockReturnValue(state);
 
-    await render(<WeatherScreen onSearchPress={onSearchPress} />);
+    await renderScreen({ onSearchPress, onLocationsPress });
     await fireEvent.press(screen.getByText(t('weather.search')));
+    await fireEvent.press(screen.getByText(t('weather.locations')));
 
     expect(onSearchPress).toHaveBeenCalledTimes(1);
+    expect(onLocationsPress).toHaveBeenCalledTimes(1);
   },
 );

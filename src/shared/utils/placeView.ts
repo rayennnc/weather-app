@@ -1,4 +1,4 @@
-import type { Place } from '../../../shared/types/place';
+import type { Place } from '../types/place';
 
 // one row of the results list, ready to draw
 export type PlaceView = {

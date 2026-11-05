@@ -8,8 +8,9 @@ const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const RESULT_COUNT = 10;
 const LANGUAGE = 'en';
 
-// the api returns nothing for a single character, so don't even ask
-export const MIN_QUERY_LENGTH = 2;
+// two letters only match an exact name and prefixes work from three on
+// (Open-Meteo docs), so don't ask before that
+export const MIN_QUERY_LENGTH = 3;
 
 export async function searchPlaces(
   query: string,
