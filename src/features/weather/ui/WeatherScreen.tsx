@@ -20,23 +20,31 @@ import { HourlyForecast } from './HourlyForecast';
 import { WeatherSkeleton } from './WeatherSkeleton';
 
 type Props = {
+  onLocationsPress: () => void;
   onSearchPress: () => void;
 };
 
-export function WeatherScreen({ onSearchPress }: Props) {
+export function WeatherScreen({ onLocationsPress, onSearchPress }: Props) {
   const t = useT();
   const state = useWeatherViewModel();
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* outside weather content, so a failed forecast still let user search for another city */}
+      {/* outside WeatherContent, so a failed forecast still lets the user pick another city */}
       <View style={styles.topBar}>
         <Pressable
           accessibilityRole="button"
-          onPress={onSearchPress}
-          style={styles.searchButton}
+          onPress={onLocationsPress}
+          style={styles.topButton}
         >
-          <Text style={styles.searchButtonText}>{t('weather.search')}</Text>
+          <Text style={styles.topButtonText}>{t('weather.locations')}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onSearchPress}
+          style={styles.topButton}
+        >
+          <Text style={styles.topButtonText}>{t('weather.search')}</Text>
         </Pressable>
       </View>
       <WeatherContent state={state} />
@@ -94,18 +102,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   topBar: {
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 8,
   },
-  searchButton: {
+  topButton: {
     minHeight: 44,
     justifyContent: 'center',
     paddingHorizontal: 16,
     borderRadius: 22,
     backgroundColor: colors.card,
   },
-  searchButtonText: {
+  topButtonText: {
     color: colors.accent,
     fontSize: 16,
     fontWeight: '600',
