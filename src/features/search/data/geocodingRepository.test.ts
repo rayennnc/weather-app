@@ -62,13 +62,23 @@ describe('searchPlaces', () => {
   });
 
   it('does not call the api for a query that is too short', async () => {
-    expect(MIN_QUERY_LENGTH).toBe(2);
+    expect(MIN_QUERY_LENGTH).toBe(3);
 
     await expect(searchPlaces('a')).resolves.toEqual([]);
+    await expect(searchPlaces('ab')).resolves.toEqual([]);
+    await expect(searchPlaces(' ab ')).resolves.toEqual([]);
     await expect(searchPlaces('  ')).resolves.toEqual([]);
     await expect(searchPlaces('')).resolves.toEqual([]);
 
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('asks the api from the shortest allowed query on', async () => {
+    fetchMock.mockResolvedValue(jsonResponse(noResults));
+
+    await searchPlaces('abc');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it('throws InvalidResponseError when the response has the wrong shape', async () => {
