@@ -4,8 +4,8 @@ import { useT } from '../../../shared/i18n/useT';
 import { getErrorMessageKey } from '../../../shared/lib/errorMessage';
 import { useLocationStore } from '../../../shared/stores/locationStore';
 import type { Place } from '../../../shared/types/place';
+import { type PlaceView, toPlaceView } from '../../../shared/utils/placeView';
 import { MIN_QUERY_LENGTH, searchPlaces } from '../data/geocodingRepository';
-import { type PlaceView, toPlaceView } from './placeView';
 import { useDebouncedValue } from './useDebouncedValue';
 
 // how long the user has to stop typing before we ask the api
