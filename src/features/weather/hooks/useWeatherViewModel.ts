@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useT } from '../../../shared/i18n/useT';
 import { getErrorMessageKey } from '../../../shared/lib/errorMessage';
 import { useLocationStore } from '../../../shared/stores/locationStore';
+import { getPlaceName } from '../../../shared/utils/placeName';
 import { getForecast } from '../data/weatherRepository';
 import { type ForecastView, toForecastView } from './forecastView';
 
@@ -51,7 +52,7 @@ export function useWeatherViewModel(): WeatherScreenState {
   if (query.data) {
     return {
       status: 'success',
-      location: activeLocation.name,
+      location: getPlaceName(activeLocation, t),
       isRefreshing,
       refresh,
       ...toForecastView(query.data, t, {
