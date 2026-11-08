@@ -1,4 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react-native';
 // the mock has to be imported before the navigation code, which loads safe-area-context
 import mockSafeAreaContext from 'react-native-safe-area-context/jest/mock';
 import { NavigationContainer } from '@react-navigation/native';
@@ -45,6 +50,9 @@ const locationsViewModel: LocationsViewModel = {
   canRemove: false,
   selectLocation: jest.fn(),
   removeLocation: jest.fn(),
+  myLocation: { status: 'idle' },
+  locateMe: jest.fn().mockResolvedValue(false),
+  openSettings: jest.fn(),
 };
 
 beforeEach(() => {
@@ -131,4 +139,29 @@ test('adding a city from the locations goes to the search and then straight back
   expect(searchInput()).not.toBeOnTheScreen();
   expect(addButton()).not.toBeOnTheScreen();
   expect(screen.getByText('No internet')).toBeOnTheScreen();
+});
+
+test('finding my location from the locations goes straight back to the weather', async () => {
+  const locateMe = jest.fn().mockResolvedValue(true);
+  mockLocations.mockReturnValue({ ...locationsViewModel, locateMe });
+  await renderNavigator();
+  await fireEvent.press(screen.getByText(t('weather.locations')));
+
+  await fireEvent.press(screen.getByText(t('locations.useMyLocation')));
+
+  await waitFor(() => expect(addButton()).not.toBeOnTheScreen());
+  expect(locateMe).toHaveBeenCalledTimes(1);
+  expect(screen.getByText('No internet')).toBeOnTheScreen();
+});
+
+test('when my location cannot be found, the locations screen stays open', async () => {
+  const locateMe = jest.fn().mockResolvedValue(false);
+  mockLocations.mockReturnValue({ ...locationsViewModel, locateMe });
+  await renderNavigator();
+  await fireEvent.press(screen.getByText(t('weather.locations')));
+
+  await fireEvent.press(screen.getByText(t('locations.useMyLocation')));
+
+  await waitFor(() => expect(locateMe).toHaveBeenCalledTimes(1));
+  expect(addButton()).toBeOnTheScreen();
 });

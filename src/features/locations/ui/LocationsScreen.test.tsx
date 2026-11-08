@@ -2,6 +2,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within,
 } from '@testing-library/react-native';
 import { t } from '../../../shared/i18n/useT';
@@ -31,6 +32,9 @@ function viewModel(
     canRemove: true,
     selectLocation: jest.fn(),
     removeLocation: jest.fn(),
+    myLocation: { status: 'idle' },
+    locateMe: jest.fn().mockResolvedValue(false),
+    openSettings: jest.fn(),
     ...overrides,
   };
 }
@@ -125,4 +129,101 @@ test('has no remove buttons when only one place is left', async () => {
   await renderScreen();
 
   expect(screen.queryByText(t('locations.remove'))).not.toBeOnTheScreen();
+});
+
+describe('use my location', () => {
+  test('is the first button, above add city', async () => {
+    mockViewModel.mockReturnValue(viewModel());
+
+    await renderScreen();
+
+    expect(screen.getByText(t('locations.useMyLocation'))).toBeOnTheScreen();
+    expect(screen.getByText(t('locations.add'))).toBeOnTheScreen();
+  });
+
+  test('closes the screen when the position was found', async () => {
+    const locateMe = jest.fn().mockResolvedValue(true);
+    const onLocationSelected = jest.fn();
+    mockViewModel.mockReturnValue(viewModel({ locateMe }));
+
+    await renderScreen({ onLocationSelected });
+    await fireEvent.press(screen.getByText(t('locations.useMyLocation')));
+
+    expect(locateMe).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(onLocationSelected).toHaveBeenCalledTimes(1));
+  });
+
+  test('stays open when the position was not found', async () => {
+    const locateMe = jest.fn().mockResolvedValue(false);
+    const onLocationSelected = jest.fn();
+    mockViewModel.mockReturnValue(viewModel({ locateMe }));
+
+    await renderScreen({ onLocationSelected });
+    await fireEvent.press(screen.getByText(t('locations.useMyLocation')));
+
+    await waitFor(() => expect(locateMe).toHaveBeenCalledTimes(1));
+    expect(onLocationSelected).not.toHaveBeenCalled();
+  });
+
+  test('shows that it is busy and cannot be pressed again while locating', async () => {
+    const locateMe = jest.fn().mockResolvedValue(true);
+    mockViewModel.mockReturnValue(
+      viewModel({ myLocation: { status: 'locating' }, locateMe }),
+    );
+
+    await renderScreen();
+    const busy = screen.getByRole('button', { name: t('locations.locating') });
+    await fireEvent.press(busy);
+
+    expect(busy).toBeDisabled();
+    expect(
+      screen.queryByText(t('locations.useMyLocation')),
+    ).not.toBeOnTheScreen();
+    expect(locateMe).not.toHaveBeenCalled();
+  });
+
+  test('shows nothing extra when idle or locating', async () => {
+    mockViewModel.mockReturnValue(viewModel());
+
+    await renderScreen();
+
+    expect(screen.queryByText(t('locations.denied'))).not.toBeOnTheScreen();
+    expect(
+      screen.queryByText(t('locations.openSettings')),
+    ).not.toBeOnTheScreen();
+  });
+
+  test.each([
+    ['denied', t('locations.denied')],
+    ['failed', t('locations.failed')],
+  ] as const)('tells the user when it is %s', async (status, message) => {
+    mockViewModel.mockReturnValue(
+      viewModel({ myLocation: { status, message } }),
+    );
+
+    await renderScreen();
+
+    expect(screen.getByText(message)).toBeOnTheScreen();
+    expect(
+      screen.queryByText(t('locations.openSettings')),
+    ).not.toBeOnTheScreen();
+    // the button is still there, to try again
+    expect(screen.getByText(t('locations.useMyLocation'))).toBeOnTheScreen();
+  });
+
+  test('a blocked permission offers the settings', async () => {
+    const openSettings = jest.fn();
+    mockViewModel.mockReturnValue(
+      viewModel({
+        myLocation: { status: 'blocked', message: t('locations.blocked') },
+        openSettings,
+      }),
+    );
+
+    await renderScreen();
+    expect(screen.getByText(t('locations.blocked'))).toBeOnTheScreen();
+    await fireEvent.press(screen.getByText(t('locations.openSettings')));
+
+    expect(openSettings).toHaveBeenCalledTimes(1);
+  });
 });
