@@ -15,9 +15,9 @@ export const en = {
 
   'search.title': 'Search city',
   'search.placeholder': 'Search for a city',
-  'search.hint': 'Type at least {count} letters to search',
-  'search.loading': 'Searching...',
-  'search.empty': 'No cities found for "{query}"',
+  'search.hint': 'Type at least {count} letters to search.',
+  'search.loading': 'Searching…',
+  'search.empty': 'No cities found for “{query}”.',
   'search.retry': 'Try again',
 
   'locations.title': 'Locations',
@@ -25,6 +25,16 @@ export const en = {
   'locations.active': 'Active',
   'locations.remove': 'Remove',
   'locations.removeLabel': 'Remove {name}',
+  'locations.useMyLocation': 'Use my location',
+  'locations.locating': 'Finding your location…',
+  'locations.myLocation': 'My location',
+  'locations.denied':
+    'Location permission was denied. Allow it when asked, or add a city instead.',
+  'locations.blocked':
+    'Location is turned off for this app. Turn it on in Settings, or add a city instead.',
+  'locations.failed':
+    'We could not find your location. Check that location is turned on and try again, or add a city instead.',
+  'locations.openSettings': 'Open settings',
 
   'detail.humidity': 'Humidity',
   'detail.wind': 'Wind',

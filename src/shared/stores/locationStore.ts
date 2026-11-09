@@ -1,7 +1,9 @@
 import { createAsyncStorage } from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import type { Coordinates } from '../types/coordinates';
 import type { Place } from '../types/place';
+import { MY_LOCATION_ID } from '../utils/placeName';
 
 // shown on the first launch, until the user picks another place
 export const DEFAULT_LOCATION: Place = {
@@ -21,6 +23,9 @@ type LocationState = {
   // makes the place active and saves it (once)
   selectLocation: (place: Place) => void;
   removeLocation: (id: Place['id']) => void;
+  // makes the gps position the active place. it is saved once and moves when
+  // the user asks again
+  saveMyLocation: (coordinates: Coordinates) => void;
 };
 
 export const useLocationStore = create<LocationState>()(
@@ -39,6 +44,29 @@ export const useLocationStore = create<LocationState>()(
             ? state.savedLocations
             : [...state.savedLocations, place],
         })),
+
+      saveMyLocation: ({ latitude, longitude }) =>
+        set(state => {
+          const place: Place = {
+            id: MY_LOCATION_ID,
+            name: '',
+            region: null,
+            country: null,
+            latitude,
+            longitude,
+          };
+          const isSaved = state.savedLocations.some(
+            saved => saved.id === MY_LOCATION_ID,
+          );
+          return {
+            activeLocation: place,
+            savedLocations: isSaved
+              ? state.savedLocations.map(saved =>
+                  saved.id === MY_LOCATION_ID ? place : saved,
+                )
+              : [...state.savedLocations, place],
+          };
+        }),
 
       removeLocation: id =>
         set(state => {

@@ -8,6 +8,7 @@ import {
   useLocationStore,
 } from '../../../shared/stores/locationStore';
 import type { Place } from '../../../shared/types/place';
+import { MY_LOCATION_ID } from '../../../shared/utils/placeName';
 import { getForecast } from '../data/weatherRepository';
 import type { Forecast } from '../data/forecast';
 import { useWeatherViewModel } from './useWeatherViewModel';
@@ -136,6 +137,29 @@ test('asks for the active location in metric units and passes the abort signal o
     expect.any(AbortSignal),
   );
   expect(result.current).toMatchObject({ location: 'Bandung' });
+});
+
+test('names the place the gps found "My location"', async () => {
+  const fromGps: Place = {
+    id: MY_LOCATION_ID,
+    name: '',
+    region: null,
+    country: null,
+    latitude: 10,
+    longitude: 20,
+  };
+  useLocationStore.setState({ activeLocation: fromGps });
+  mockGetForecast.mockResolvedValue(forecast);
+  const { wrapper } = setup();
+
+  const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
+
+  await waitFor(() => expect(result.current.status).toBe('success'));
+  expect(result.current).toMatchObject({ location: t('locations.myLocation') });
+  expect(mockGetForecast).toHaveBeenCalledWith(
+    expect.objectContaining({ latitude: 10, longitude: 20 }),
+    expect.any(AbortSignal),
+  );
 });
 
 test('waits for the saved location before it fetches', async () => {
