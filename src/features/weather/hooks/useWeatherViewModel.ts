@@ -4,6 +4,7 @@ import { useT } from '../../../shared/i18n/useT';
 import { getErrorMessageKey } from '../../../shared/lib/errorMessage';
 import { useLocationStore } from '../../../shared/stores/locationStore';
 import { getPlaceName } from '../../../shared/utils/placeName';
+import { FORECAST_MAX_AGE, FORECAST_QUERY_KEY } from '../data/forecastCache';
 import { getForecast } from '../data/weatherRepository';
 import { type ForecastView, toForecastView } from './forecastView';
 
@@ -33,7 +34,7 @@ export function useWeatherViewModel(): WeatherScreenState {
   const query = useQuery({
     // everything the request depends on goes in the key, so a new location
     // means a new request
-    queryKey: ['forecast', params],
+    queryKey: [FORECAST_QUERY_KEY, params],
     queryFn: ({ signal }) => getForecast(params, signal),
     // wait for the saved location, or we would fetch Jakarta first and then
     // the real one
@@ -48,14 +49,20 @@ export function useWeatherViewModel(): WeatherScreenState {
     query.refetch().finally(() => setIsRefreshing(false));
   }
 
-  // data wins over error: if a refresh fails we keep the last forecast on screen
-  if (query.data) {
+  // read on every render: a forecast saved hours ago is drawn against the time
+  // it is now ("Now", "Today") and not against the time it was fetched
+  const now = Date.now();
+
+  // data wins over error: if a refresh fails we keep the last forecast on screen,
+  // until it is too old to be worth showing
+  if (query.data && now - query.dataUpdatedAt <= FORECAST_MAX_AGE) {
     return {
       status: 'success',
       location: getPlaceName(activeLocation, t),
       isRefreshing,
       refresh,
       ...toForecastView(query.data, t, {
+        now,
         updatedAt: query.dataUpdatedAt,
         windSpeedUnit: UNITS.windSpeedUnit,
       }),

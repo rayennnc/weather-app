@@ -56,8 +56,12 @@ const forecast: Forecast = {
   ],
 };
 
-// 04:51 UTC, which is 11:51 in Jakarta (+7)
+// 07:20 UTC, which is 14:20 in Jakarta (+7): the hour of the first entry
+const now = Date.UTC(2026, 9, 28, 7, 20);
+
+// 04:51 UTC, which is 11:51 in Jakarta
 const options = {
+  now,
   updatedAt: Date.UTC(2026, 9, 28, 4, 51),
   windSpeedUnit: 'kmh',
 } as const;
@@ -154,5 +158,82 @@ describe('toForecastView', () => {
 
     expect(empty.hourly).toEqual([]);
     expect(empty.daily).toEqual([]);
+  });
+});
+
+describe('toForecastView with an old forecast', () => {
+  // the clock of Jakarta is 7 hours ahead of UTC
+  const at = (day: number, hour: number, minute = 0) =>
+    Date.UTC(2026, 9, day, hour - 7, minute);
+
+  test('drops the hours that are over and moves Now to the current hour', () => {
+    const view = toForecastView(forecast, t, {
+      ...options,
+      now: at(28, 15, 10),
+    });
+
+    expect(view.hourly.map(hour => [hour.time, hour.label])).toEqual([
+      ['2026-10-28T15:00', 'Now'],
+    ]);
+  });
+
+  test('has no hours left when all of them are over', () => {
+    const view = toForecastView(forecast, t, { ...options, now: at(28, 16) });
+
+    expect(view.hourly).toEqual([]);
+  });
+
+  test('labels no hour Now when the forecast starts after the clock', () => {
+    const view = toForecastView(forecast, t, {
+      ...options,
+      now: at(28, 13, 40),
+    });
+
+    expect(view.hourly.map(hour => hour.label)).toEqual(['14:00', '15:00']);
+  });
+
+  test('takes today from the clock of the place, not from when the api answered', () => {
+    // 01:00 on the 29th in Jakarta is still the 28th in UTC
+    const view = toForecastView(forecast, t, { ...options, now: at(29, 1) });
+
+    expect(view.daily.map(day => [day.date, day.label])).toEqual([
+      ['2026-10-29', 'Today'],
+    ]);
+    // the 28th has a UV index of 11, the 29th has none
+    expect(view.details.find(detail => detail.id === 'uv')?.value).toBe('–');
+  });
+
+  test('has no days left when the forecast is over', () => {
+    const view = toForecastView(forecast, t, {
+      ...options,
+      now: Date.UTC(2026, 10, 5),
+    });
+
+    expect(view.daily).toEqual([]);
+    expect(view.details.map(detail => detail.value).slice(3)).toEqual([
+      '–',
+      '–',
+      '–',
+    ]);
+  });
+
+  test('says on which day the data was updated when that was not today', () => {
+    // 04:51 UTC on the 27th is 11:51 in Jakarta, on a Tuesday
+    const view = toForecastView(forecast, t, {
+      ...options,
+      updatedAt: Date.UTC(2026, 9, 27, 4, 51),
+    });
+
+    expect(view.updated).toBe('Updated Tue 11:51');
+  });
+
+  test('compares the update day with today on the clock of the place', () => {
+    // 18:30 UTC on the 27th is 01:30 on the 28th in Jakarta, which is today
+    const view = toForecastView(forecast, t, {
+      ...options,
+      updatedAt: Date.UTC(2026, 9, 27, 18, 30),
+    });
+
+    expect(view.updated).toBe('Updated 01:30');
   });
 });
