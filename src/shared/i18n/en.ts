@@ -10,6 +10,7 @@ export const en = {
   'weather.dailyTitle': '7-day forecast',
   'weather.detailsTitle': 'Details',
   'weather.updated': 'Updated {time}',
+  'weather.updatedOn': 'Updated {day} {time}',
   'weather.search': 'Search',
   'weather.locations': 'Locations',
 
