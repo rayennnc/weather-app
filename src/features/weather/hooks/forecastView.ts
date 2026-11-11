@@ -9,6 +9,7 @@ import {
   type WindSpeedUnit,
 } from '../../../shared/utils/formatWindSpeed';
 import { getWeekday } from '../../../shared/utils/getWeekday';
+import { localIsoAtOffset } from '../../../shared/utils/localIsoAtOffset';
 import type { WeatherCondition } from '../../../shared/utils/weatherCode';
 import type { Forecast } from '../data/forecast';
 
@@ -59,6 +60,7 @@ export type ForecastView = {
 };
 
 type Options = {
+  now: number; // epoch ms, the moment the screen is drawn
   updatedAt: number; // epoch ms of the last successful fetch
   windSpeedUnit: WindSpeedUnit;
 };
@@ -70,13 +72,19 @@ function formatChance(value: number | null): string | null {
 export function toForecastView(
   forecast: Forecast,
   t: Translate,
-  { updatedAt, windSpeedUnit }: Options,
+  { now, updatedAt, windSpeedUnit }: Options,
 ): ForecastView {
-  const { current } = forecast;
-  // date part of the location's current time, e.g. '2026-10-28'
-  const today = current.time.slice(0, 10);
+  const { current, utcOffsetSeconds } = forecast;
+  // a forecast can be hours or days old (it is saved on the phone), so "now"
+  // and "today" come from the clock of the place, not from when the api answered
+  const clock = localIsoAtOffset(now, utcOffsetSeconds); // '2026-10-28T14:20'
+  const today = clock.slice(0, 10);
+  const thisHour = clock.slice(0, 13);
   const todayDaily = forecast.daily.find(day => day.date === today);
   const uvIndex = todayDaily?.uvIndexMax ?? null;
+  const updatedClock = localIsoAtOffset(updatedAt, utcOffsetSeconds);
+  const updatedDate = updatedClock.slice(0, 10);
+  const updatedTime = formatTimeAtOffset(updatedAt, utcOffsetSeconds);
 
   return {
     current: {
@@ -88,29 +96,41 @@ export function toForecastView(
         temperature: formatTemperature(current.apparentTemperature),
       }),
     },
-    updated: t('weather.updated', {
-      time: formatTimeAtOffset(updatedAt, forecast.utcOffsetSeconds),
-    }),
-    // the api starts the hourly list at the current hour
-    hourly: forecast.hourly.map((hour, index) => ({
-      time: hour.time,
-      label: index === 0 ? t('weather.now') : formatHour(hour.time),
-      condition: hour.condition,
-      isDay: hour.isDay,
-      temperature: formatTemperature(hour.temperature),
-      precipitationChance: formatChance(hour.precipitationProbability),
-    })),
-    daily: forecast.daily.map(day => ({
-      date: day.date,
-      label:
-        day.date === today
-          ? t('weather.today')
-          : t(`weekday.${getWeekday(day.date)}`),
-      condition: day.condition,
-      temperatureMax: formatTemperature(day.temperatureMax),
-      temperatureMin: formatTemperature(day.temperatureMin),
-      precipitationChance: formatChance(day.precipitationProbabilityMax),
-    })),
+    // add the weekday when the data is not from today, or "11:51" alone is a guess
+    updated:
+      updatedDate === today
+        ? t('weather.updated', { time: updatedTime })
+        : t('weather.updatedOn', {
+            day: t(`weekday.${getWeekday(updatedDate)}`),
+            time: updatedTime,
+          }),
+    // the hours that are over are dropped, so the list starts at the current hour.
+    // the strings are fixed width, so comparing them as text compares the times
+    hourly: forecast.hourly
+      .filter(hour => hour.time >= thisHour)
+      .map(hour => ({
+        time: hour.time,
+        label: hour.time.startsWith(thisHour)
+          ? t('weather.now')
+          : formatHour(hour.time),
+        condition: hour.condition,
+        isDay: hour.isDay,
+        temperature: formatTemperature(hour.temperature),
+        precipitationChance: formatChance(hour.precipitationProbability),
+      })),
+    daily: forecast.daily
+      .filter(day => day.date >= today)
+      .map(day => ({
+        date: day.date,
+        label:
+          day.date === today
+            ? t('weather.today')
+            : t(`weekday.${getWeekday(day.date)}`),
+        condition: day.condition,
+        temperatureMax: formatTemperature(day.temperatureMax),
+        temperatureMin: formatTemperature(day.temperatureMin),
+        precipitationChance: formatChance(day.precipitationProbabilityMax),
+      })),
     details: [
       {
         id: 'humidity',

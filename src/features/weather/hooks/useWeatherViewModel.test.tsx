@@ -9,6 +9,7 @@ import {
 } from '../../../shared/stores/locationStore';
 import type { Place } from '../../../shared/types/place';
 import { MY_LOCATION_ID } from '../../../shared/utils/placeName';
+import { FORECAST_MAX_AGE } from '../data/forecastCache';
 import { getForecast } from '../data/weatherRepository';
 import type { Forecast } from '../data/forecast';
 import { useWeatherViewModel } from './useWeatherViewModel';
@@ -73,7 +74,14 @@ const bandung: Place = {
   longitude: 107.6191,
 };
 
+// 07:20 UTC is 14:20 in Jakarta, the hour of the forecast above. the clock is
+// fixed, so "Now" and "Today" do not depend on the day the test runs
+const NOW = Date.UTC(2026, 9, 28, 7, 20);
+const HOUR = 60 * 60 * 1000;
+let nowSpy: jest.SpyInstance<number, []>;
+
 beforeEach(() => {
+  nowSpy = jest.spyOn(Date, 'now').mockReturnValue(NOW);
   mockGetForecast.mockReset();
   // the saved location is already read, unless a test says otherwise
   useLocationStore.setState({
@@ -81,6 +89,10 @@ beforeEach(() => {
     savedLocations: [DEFAULT_LOCATION],
     hasHydrated: true,
   });
+});
+
+afterEach(() => {
+  nowSpy.mockRestore();
 });
 
 test('starts in the loading state', async () => {
@@ -280,4 +292,81 @@ test('refresh turns isRefreshing on until the new forecast is in', async () => {
     expect(result.current).toMatchObject({ isRefreshing: false }),
   );
   expect(mockGetForecast).toHaveBeenCalledTimes(2);
+});
+
+test('draws a forecast that is hours old against the clock of now', async () => {
+  mockGetForecast.mockResolvedValue(forecast);
+  const { wrapper } = setup();
+  const { result, rerender } = await renderHook(() => useWeatherViewModel(), {
+    wrapper,
+  });
+  await waitFor(() => expect(result.current.status).toBe('success'));
+  expect(result.current).toMatchObject({ hourly: [{ label: 'Now' }] });
+
+  // it is 17:20 in Jakarta now, so the only hour of the forecast is over
+  nowSpy.mockReturnValue(NOW + 3 * HOUR);
+  await rerender(undefined);
+
+  expect(result.current).toMatchObject({
+    status: 'success',
+    updated: 'Updated 14:20',
+    hourly: [],
+  });
+});
+
+test('says on which day an older forecast is from', async () => {
+  mockGetForecast.mockResolvedValue(forecast);
+  const { wrapper } = setup();
+  const { result, rerender } = await renderHook(() => useWeatherViewModel(), {
+    wrapper,
+  });
+  await waitFor(() => expect(result.current.status).toBe('success'));
+
+  nowSpy.mockReturnValue(NOW + 24 * HOUR);
+  await rerender(undefined);
+
+  // the only day of the forecast is yesterday now, so it is dropped
+  expect(result.current).toMatchObject({
+    updated: 'Updated Wed 14:20',
+    daily: [],
+  });
+});
+
+test('shows a forecast up to 7 days old and not older', async () => {
+  mockGetForecast
+    .mockResolvedValueOnce(forecast)
+    .mockReturnValue(new Promise<Forecast>(() => {}));
+  const { wrapper } = setup();
+  const { result, rerender } = await renderHook(() => useWeatherViewModel(), {
+    wrapper,
+  });
+  await waitFor(() => expect(result.current.status).toBe('success'));
+
+  nowSpy.mockReturnValue(NOW + FORECAST_MAX_AGE);
+  await rerender(undefined);
+  expect(result.current.status).toBe('success');
+
+  nowSpy.mockReturnValue(NOW + FORECAST_MAX_AGE + 1);
+  await rerender(undefined);
+  expect(result.current).toEqual({ status: 'loading' });
+});
+
+test('shows the error when the refresh fails and the forecast is too old', async () => {
+  mockGetForecast
+    .mockResolvedValueOnce(forecast)
+    .mockRejectedValueOnce(new NetworkError('offline'));
+  const { client, wrapper } = setup();
+  const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
+  await waitFor(() => expect(result.current.status).toBe('success'));
+
+  nowSpy.mockReturnValue(NOW + FORECAST_MAX_AGE + 1);
+  await act(async () => {
+    await client.refetchQueries();
+    await new Promise<void>(resolve => setTimeout(resolve, 0));
+  });
+
+  expect(result.current).toMatchObject({
+    status: 'error',
+    message: t('error.network'),
+  });
 });
