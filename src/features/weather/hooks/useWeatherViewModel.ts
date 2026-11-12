@@ -3,13 +3,11 @@ import { useState } from 'react';
 import { useT } from '../../../shared/i18n/useT';
 import { getErrorMessageKey } from '../../../shared/lib/errorMessage';
 import { useLocationStore } from '../../../shared/stores/locationStore';
+import { useUnitStore } from '../../../shared/stores/unitStore';
 import { getPlaceName } from '../../../shared/utils/placeName';
 import { FORECAST_MAX_AGE, FORECAST_QUERY_KEY } from '../data/forecastCache';
 import { getForecast } from '../data/weatherRepository';
 import { type ForecastView, toForecastView } from './forecastView';
-
-// units are fixed until the settings screen (M5)
-const UNITS = { temperatureUnit: 'celsius', windSpeedUnit: 'kmh' } as const;
 
 // what the screen can be in. the screen never sees the raw forecast
 export type WeatherScreenState =
@@ -25,20 +23,24 @@ export type WeatherScreenState =
 export function useWeatherViewModel(): WeatherScreenState {
   const t = useT();
   const activeLocation = useLocationStore(state => state.activeLocation);
-  const hasHydrated = useLocationStore(state => state.hasHydrated);
+  const hasLocationHydrated = useLocationStore(state => state.hasHydrated);
+  const temperatureUnit = useUnitStore(state => state.temperatureUnit);
+  const windSpeedUnit = useUnitStore(state => state.windSpeedUnit);
+  const haveUnitsHydrated = useUnitStore(state => state.hasHydrated);
   const params = {
     latitude: activeLocation.latitude,
     longitude: activeLocation.longitude,
-    ...UNITS,
+    temperatureUnit,
+    windSpeedUnit,
   };
   const query = useQuery({
     // everything the request depends on goes in the key, so a new location
     // means a new request
     queryKey: [FORECAST_QUERY_KEY, params],
     queryFn: ({ signal }) => getForecast(params, signal),
-    // wait for the saved location, or we would fetch Jakarta first and then
-    // the real one
-    enabled: hasHydrated,
+    // wait for the saved location and units, or we would fetch Jakarta in
+    // metric first and then the real ones
+    enabled: hasLocationHydrated && haveUnitsHydrated,
   });
 
   // pull-to-refresh has its own flag: isFetching would also be true for the
@@ -64,7 +66,7 @@ export function useWeatherViewModel(): WeatherScreenState {
       ...toForecastView(query.data, t, {
         now,
         updatedAt: query.dataUpdatedAt,
-        windSpeedUnit: UNITS.windSpeedUnit,
+        windSpeedUnit,
       }),
     };
   }

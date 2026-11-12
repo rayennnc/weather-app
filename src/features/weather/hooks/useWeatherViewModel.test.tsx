@@ -7,6 +7,7 @@ import {
   DEFAULT_LOCATION,
   useLocationStore,
 } from '../../../shared/stores/locationStore';
+import { DEFAULT_UNITS, useUnitStore } from '../../../shared/stores/unitStore';
 import type { Place } from '../../../shared/types/place';
 import { MY_LOCATION_ID } from '../../../shared/utils/placeName';
 import { FORECAST_MAX_AGE } from '../data/forecastCache';
@@ -89,6 +90,7 @@ beforeEach(() => {
     savedLocations: [DEFAULT_LOCATION],
     hasHydrated: true,
   });
+  useUnitStore.setState({ ...DEFAULT_UNITS, hasHydrated: true });
 });
 
 afterEach(() => {
@@ -130,7 +132,7 @@ test('turns the forecast into display-ready values', async () => {
   });
 });
 
-test('asks for the active location in metric units and passes the abort signal on', async () => {
+test('asks for the active location in the default units and passes the abort signal on', async () => {
   useLocationStore.setState({ activeLocation: bandung });
   mockGetForecast.mockResolvedValue(forecast);
   const { wrapper } = setup();
@@ -292,6 +294,76 @@ test('refresh turns isRefreshing on until the new forecast is in', async () => {
     expect(result.current).toMatchObject({ isRefreshing: false }),
   );
   expect(mockGetForecast).toHaveBeenCalledTimes(2);
+});
+
+test('asks for the saved units and shows the wind speed in them', async () => {
+  useUnitStore.setState({
+    temperatureUnit: 'fahrenheit',
+    windSpeedUnit: 'mph',
+  });
+  mockGetForecast.mockResolvedValue(forecast);
+  const { wrapper } = setup();
+
+  const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
+
+  await waitFor(() => expect(result.current.status).toBe('success'));
+  expect(mockGetForecast).toHaveBeenCalledWith(
+    expect.objectContaining({
+      temperatureUnit: 'fahrenheit',
+      windSpeedUnit: 'mph',
+    }),
+    expect.any(AbortSignal),
+  );
+  expect(result.current).toMatchObject({
+    details: expect.arrayContaining([
+      expect.objectContaining({ id: 'wind', value: '9 mph' }),
+    ]),
+  });
+});
+
+test('fetches again in the new unit when a unit changes', async () => {
+  const fahrenheit: Forecast = {
+    ...forecast,
+    current: { ...forecast.current, temperature: 87.1 },
+  };
+  mockGetForecast
+    .mockResolvedValueOnce(forecast)
+    .mockResolvedValueOnce(fahrenheit);
+  const { wrapper } = setup();
+  const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
+  await waitFor(() =>
+    expect(result.current).toMatchObject({ current: { temperature: '31°' } }),
+  );
+
+  await act(async () => {
+    useUnitStore.getState().setTemperatureUnit('fahrenheit');
+  });
+
+  await waitFor(() =>
+    expect(result.current).toMatchObject({ current: { temperature: '87°' } }),
+  );
+  expect(mockGetForecast).toHaveBeenCalledTimes(2);
+  expect(mockGetForecast).toHaveBeenLastCalledWith(
+    expect.objectContaining({ temperatureUnit: 'fahrenheit' }),
+    expect.any(AbortSignal),
+  );
+});
+
+test('waits for the saved units before it fetches', async () => {
+  useUnitStore.setState({ hasHydrated: false });
+  mockGetForecast.mockResolvedValue(forecast);
+  const { wrapper } = setup();
+
+  const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
+  expect(result.current).toEqual({ status: 'loading' });
+  expect(mockGetForecast).not.toHaveBeenCalled();
+
+  await act(async () => {
+    useUnitStore.setState({ hasHydrated: true });
+  });
+
+  await waitFor(() => expect(result.current.status).toBe('success'));
+  expect(mockGetForecast).toHaveBeenCalledTimes(1);
 });
 
 test('draws a forecast that is hours old against the clock of now', async () => {
