@@ -14,6 +14,7 @@ const renderScreen = (
     <WeatherScreen
       onLocationsPress={jest.fn()}
       onSearchPress={jest.fn()}
+      onSettingsPress={jest.fn()}
       {...props}
     />,
   );
@@ -129,17 +130,20 @@ const statesWithTheButtons: [string, WeatherScreenState][] = [
 ];
 
 test.each(statesWithTheButtons)(
-  'the search and locations buttons are there and work while showing %s',
+  'the search, locations and settings buttons are there and work while showing %s',
   async (_name, state) => {
     const onSearchPress = jest.fn();
     const onLocationsPress = jest.fn();
+    const onSettingsPress = jest.fn();
     mockViewModel.mockReturnValue(state);
 
-    await renderScreen({ onSearchPress, onLocationsPress });
+    await renderScreen({ onSearchPress, onLocationsPress, onSettingsPress });
     await fireEvent.press(screen.getByText(t('weather.search')));
     await fireEvent.press(screen.getByText(t('weather.locations')));
+    await fireEvent.press(screen.getByText(t('weather.settings')));
 
     expect(onSearchPress).toHaveBeenCalledTimes(1);
     expect(onLocationsPress).toHaveBeenCalledTimes(1);
+    expect(onSettingsPress).toHaveBeenCalledTimes(1);
   },
 );

@@ -22,9 +22,14 @@ import { WeatherSkeleton } from './WeatherSkeleton';
 type Props = {
   onLocationsPress: () => void;
   onSearchPress: () => void;
+  onSettingsPress: () => void;
 };
 
-export function WeatherScreen({ onLocationsPress, onSearchPress }: Props) {
+export function WeatherScreen({
+  onLocationsPress,
+  onSearchPress,
+  onSettingsPress,
+}: Props) {
   const t = useT();
   const state = useWeatherViewModel();
 
@@ -39,13 +44,22 @@ export function WeatherScreen({ onLocationsPress, onSearchPress }: Props) {
         >
           <Text style={styles.topButtonText}>{t('weather.locations')}</Text>
         </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onSearchPress}
-          style={styles.topButton}
-        >
-          <Text style={styles.topButtonText}>{t('weather.search')}</Text>
-        </Pressable>
+        <View style={styles.topButtons}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={onSearchPress}
+            style={styles.topButton}
+          >
+            <Text style={styles.topButtonText}>{t('weather.search')}</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={onSettingsPress}
+            style={styles.topButton}
+          >
+            <Text style={styles.topButtonText}>{t('weather.settings')}</Text>
+          </Pressable>
+        </View>
       </View>
       <WeatherContent state={state} />
     </SafeAreaView>
@@ -103,9 +117,17 @@ const styles = StyleSheet.create({
   },
   topBar: {
     flexDirection: 'row',
+    // a large font can make the buttons too wide for one row
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
+    gap: 8,
     paddingHorizontal: 16,
     paddingTop: 8,
+  },
+  topButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
   },
   topButton: {
     minHeight: 44,

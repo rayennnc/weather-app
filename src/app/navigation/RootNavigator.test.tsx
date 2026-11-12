@@ -15,6 +15,10 @@ import {
   type SearchViewModel,
   useSearchViewModel,
 } from '../../features/search/hooks/useSearchViewModel';
+import {
+  type SettingsViewModel,
+  useSettingsViewModel,
+} from '../../features/settings/hooks/useSettingsViewModel';
 import { useWeatherViewModel } from '../../features/weather/hooks/useWeatherViewModel';
 import { t } from '../../shared/i18n/useT';
 import { RootNavigator } from './RootNavigator';
@@ -24,9 +28,11 @@ jest.mock('react-native-safe-area-context', () => mockSafeAreaContext);
 jest.mock('../../features/weather/hooks/useWeatherViewModel');
 jest.mock('../../features/search/hooks/useSearchViewModel');
 jest.mock('../../features/locations/hooks/useLocationsViewModel');
+jest.mock('../../features/settings/hooks/useSettingsViewModel');
 const mockWeather = jest.mocked(useWeatherViewModel);
 const mockSearch = jest.mocked(useSearchViewModel);
 const mockLocations = jest.mocked(useLocationsViewModel);
+const mockSettings = jest.mocked(useSettingsViewModel);
 
 const searchViewModel: SearchViewModel = {
   query: 'Ban',
@@ -55,6 +61,19 @@ const locationsViewModel: LocationsViewModel = {
   openSettings: jest.fn(),
 };
 
+const settingsViewModel: SettingsViewModel = {
+  temperatureOptions: [
+    { value: 'celsius', label: '°C', isSelected: true },
+    { value: 'fahrenheit', label: '°F', isSelected: false },
+  ],
+  windSpeedOptions: [
+    { value: 'kmh', label: 'km/h', isSelected: true },
+    { value: 'mph', label: 'mph', isSelected: false },
+  ],
+  selectTemperature: jest.fn(),
+  selectWindSpeed: jest.fn(),
+};
+
 beforeEach(() => {
   mockWeather.mockReturnValue({
     status: 'error',
@@ -63,6 +82,7 @@ beforeEach(() => {
   });
   mockSearch.mockReturnValue(searchViewModel);
   mockLocations.mockReturnValue(locationsViewModel);
+  mockSettings.mockReturnValue(settingsViewModel);
 });
 
 const renderNavigator = () =>
@@ -164,4 +184,26 @@ test('when my location cannot be found, the locations screen stays open', async 
 
   await waitFor(() => expect(locateMe).toHaveBeenCalledTimes(1));
   expect(addButton()).toBeOnTheScreen();
+});
+
+test('the settings button opens the settings screen', async () => {
+  await renderNavigator();
+  expect(screen.queryByText(t('settings.temperature'))).not.toBeOnTheScreen();
+
+  await fireEvent.press(screen.getByText(t('weather.settings')));
+
+  expect(screen.getByText(t('settings.temperature'))).toBeOnTheScreen();
+  expect(screen.getByText(t('settings.windSpeed'))).toBeOnTheScreen();
+});
+
+test('choosing a unit in the settings keeps the settings screen open', async () => {
+  const selectTemperature = jest.fn();
+  mockSettings.mockReturnValue({ ...settingsViewModel, selectTemperature });
+  await renderNavigator();
+  await fireEvent.press(screen.getByText(t('weather.settings')));
+
+  await fireEvent.press(screen.getByText('°F'));
+
+  expect(selectTemperature).toHaveBeenCalledWith('fahrenheit');
+  expect(screen.getByText(t('settings.temperature'))).toBeOnTheScreen();
 });
