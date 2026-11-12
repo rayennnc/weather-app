@@ -4,6 +4,7 @@ import {
 } from '@react-navigation/native-stack';
 import { LocationsScreen } from '../../features/locations/ui/LocationsScreen';
 import { SearchScreen } from '../../features/search/ui/SearchScreen';
+import { SettingsScreen } from '../../features/settings/ui/SettingsScreen';
 import { WeatherScreen } from '../../features/weather/ui/WeatherScreen';
 import { useT } from '../../shared/i18n/useT';
 
@@ -11,6 +12,7 @@ export type RootStackParamList = {
   Weather: undefined;
   Locations: undefined;
   Search: undefined;
+  Settings: undefined;
 };
 
 type RouteProps<Name extends keyof RootStackParamList> = NativeStackScreenProps<
@@ -27,6 +29,7 @@ function WeatherRoute({ navigation }: RouteProps<'Weather'>) {
     <WeatherScreen
       onLocationsPress={() => navigation.navigate('Locations')}
       onSearchPress={() => navigation.navigate('Search')}
+      onSettingsPress={() => navigation.navigate('Settings')}
     />
   );
 }
@@ -65,6 +68,11 @@ export function RootNavigator() {
         name="Search"
         component={SearchRoute}
         options={{ title: t('search.title') }}
+      />
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ title: t('settings.title') }}
       />
     </Stack.Navigator>
   );
