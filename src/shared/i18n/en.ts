@@ -13,6 +13,7 @@ export const en = {
   'weather.updatedOn': 'Updated {day} {time}',
   'weather.search': 'Search',
   'weather.locations': 'Locations',
+  'weather.settings': 'Settings',
 
   'search.title': 'Search city',
   'search.placeholder': 'Search for a city',
@@ -36,6 +37,15 @@ export const en = {
   'locations.failed':
     'We could not find your location. Check that location is turned on and try again, or add a city instead.',
   'locations.openSettings': 'Open settings',
+
+  'settings.title': 'Settings',
+  'settings.temperature': 'Temperature',
+  'settings.windSpeed': 'Wind speed',
+
+  'unit.celsius': '°C',
+  'unit.fahrenheit': '°F',
+  'unit.kmh': 'km/h',
+  'unit.mph': 'mph',
 
   'detail.humidity': 'Humidity',
   'detail.wind': 'Wind',
