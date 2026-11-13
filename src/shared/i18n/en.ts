@@ -11,6 +11,7 @@ export const en = {
   'weather.detailsTitle': 'Details',
   'weather.updated': 'Updated {time}',
   'weather.updatedOn': 'Updated {day} {time}',
+  'weather.attribution': 'Weather data by Open-Meteo.com',
   'weather.search': 'Search',
   'weather.locations': 'Locations',
   'weather.settings': 'Settings',

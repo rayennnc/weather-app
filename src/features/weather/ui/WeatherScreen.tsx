@@ -105,6 +105,13 @@ function WeatherContent({ state }: { state: WeatherScreenState }) {
           <HourlyForecast hours={state.hourly} />
           <DailyForecast days={state.daily} />
           <DetailsCard details={state.details} />
+          <Pressable
+            accessibilityRole="link"
+            onPress={state.openAttribution}
+            style={styles.attribution}
+          >
+            <Text style={styles.attributionText}>{state.attribution}</Text>
+          </Pressable>
         </ScrollView>
       );
   }
@@ -151,6 +158,16 @@ const styles = StyleSheet.create({
   scroll: {
     padding: 16,
     gap: 16,
+  },
+  attribution: {
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  attributionText: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
   },
   message: {
     fontSize: 16,

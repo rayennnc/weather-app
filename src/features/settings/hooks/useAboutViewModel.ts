@@ -1,15 +1,20 @@
 import { useT } from '../../../shared/i18n/useT';
-import { OPEN_METEO_URL, GEONAMES_URL, LICENSE_URL } from '../data/dataSources';
-import { openLink } from '../data/openLink';
+import {
+  GEONAMES_URL,
+  LICENSE_URL,
+  OPEN_METEO_URL,
+} from '../../../shared/lib/dataSources';
+import { openLink } from '../../../shared/lib/openLink';
 
+// one source of data, ready to draw
 export type SourceView = {
   id: 'weather' | 'places';
   title: string;
-  credit: string;
+  credit: string; // the credit that Open-Meteo and GeoNames ask for
   creditUrl: string;
   license: string;
   licenseUrl: string;
-  note: string | null;
+  note: string | null; // says that the values were changed, as CC BY asks
 };
 
 export type AboutViewModel = {

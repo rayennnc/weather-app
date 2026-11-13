@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react-native';
-import { openLink } from '../data/openLink';
+import { openLink } from '../../../shared/lib/openLink';
 import { useAboutViewModel } from './useAboutViewModel';
 
-jest.mock('../data/openLink');
+jest.mock('../../../shared/lib/openLink');
 const mockOpenLink = jest.mocked(openLink);
 
 beforeEach(() => {
