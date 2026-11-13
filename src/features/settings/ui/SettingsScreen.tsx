@@ -1,11 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useT } from '../../../shared/i18n/useT';
 import { colors } from '../../../shared/theme/colors';
 import { useSettingsViewModel } from '../hooks/useSettingsViewModel';
 import { SegmentedControl } from './SegmentedControl';
 
-export function SettingsScreen() {
+type Props = {
+  // opens the about screen, so the navigator decides where it goes
+  onAboutPress: () => void;
+};
+
+export function SettingsScreen({ onAboutPress }: Props) {
   const t = useT();
   const {
     temperatureOptions,
@@ -37,6 +42,16 @@ export function SettingsScreen() {
           onSelect={selectWindSpeed}
         />
       </View>
+      <Pressable
+        // named by its label, so a screen reader does not read the arrow
+        accessibilityLabel={t('settings.about')}
+        accessibilityRole="button"
+        onPress={onAboutPress}
+        style={styles.row}
+      >
+        <Text style={styles.rowText}>{t('settings.about')}</Text>
+        <Text style={styles.arrow}>›</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -55,5 +70,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: colors.text,
+  },
+  row: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+  },
+  rowText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  arrow: {
+    fontSize: 20,
+    color: colors.textSecondary,
   },
 });
