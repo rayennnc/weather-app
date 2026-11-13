@@ -28,6 +28,8 @@ const success: WeatherScreenState = {
   location: 'Jakarta',
   isRefreshing: false,
   refresh: jest.fn(),
+  attribution: 'Weather data by Open-Meteo.com',
+  openAttribution: jest.fn(),
   current: {
     condition: 'partlyCloudy',
     isDay: true,
@@ -99,6 +101,31 @@ test('shows the current weather, the hours, the days and the details', async () 
   expect(screen.getByText('Today')).toBeOnTheScreen();
   expect(screen.getByText('Humidity')).toBeOnTheScreen();
   expect(screen.getByText('9 km/h')).toBeOnTheScreen();
+});
+
+test('credits Open-Meteo under the forecast, as a link that opens its site', async () => {
+  const openAttribution = jest.fn();
+  mockViewModel.mockReturnValue({ ...success, openAttribution });
+
+  await renderScreen();
+  await fireEvent.press(
+    screen.getByRole('link', { name: 'Weather data by Open-Meteo.com' }),
+  );
+
+  expect(openAttribution).toHaveBeenCalledTimes(1);
+});
+
+test.each([
+  ['the skeleton', { status: 'loading' }],
+  ['an error', { status: 'error', message: 'No internet', retry: jest.fn() }],
+] as const)('shows no credit while showing %s', async (_name, state) => {
+  mockViewModel.mockReturnValue(state);
+
+  await renderScreen();
+
+  expect(
+    screen.queryByText('Weather data by Open-Meteo.com'),
+  ).not.toBeOnTheScreen();
 });
 
 test('pulling down calls refresh', async () => {

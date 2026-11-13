@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useT } from '../../../shared/i18n/useT';
+import { OPEN_METEO_URL } from '../../../shared/lib/dataSources';
 import { getErrorMessageKey } from '../../../shared/lib/errorMessage';
+import { openLink } from '../../../shared/lib/openLink';
 import { useLocationStore } from '../../../shared/stores/locationStore';
 import { useUnitStore } from '../../../shared/stores/unitStore';
 import { getPlaceName } from '../../../shared/utils/placeName';
@@ -18,6 +20,9 @@ export type WeatherScreenState =
       location: string;
       isRefreshing: boolean;
       refresh: () => void;
+      // the credit that Open-Meteo asks for next to its data, and what it opens
+      attribution: string;
+      openAttribution: () => void;
     } & ForecastView);
 
 export function useWeatherViewModel(): WeatherScreenState {
@@ -63,6 +68,10 @@ export function useWeatherViewModel(): WeatherScreenState {
       location: getPlaceName(activeLocation, t),
       isRefreshing,
       refresh,
+      attribution: t('weather.attribution'),
+      openAttribution: () => {
+        openLink(OPEN_METEO_URL);
+      },
       ...toForecastView(query.data, t, {
         now,
         updatedAt: query.dataUpdatedAt,

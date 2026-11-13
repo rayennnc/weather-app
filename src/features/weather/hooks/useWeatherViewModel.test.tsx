@@ -3,6 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import type { ReactNode } from 'react';
 import { t } from '../../../shared/i18n/useT';
 import { NetworkError } from '../../../shared/lib/errors';
+import { openLink } from '../../../shared/lib/openLink';
 import {
   DEFAULT_LOCATION,
   useLocationStore,
@@ -16,7 +17,9 @@ import type { Forecast } from '../data/forecast';
 import { useWeatherViewModel } from './useWeatherViewModel';
 
 jest.mock('../data/weatherRepository');
+jest.mock('../../../shared/lib/openLink');
 const mockGetForecast = jest.mocked(getForecast);
+const mockOpenLink = jest.mocked(openLink);
 
 const forecast: Forecast = {
   timezone: 'Asia/Jakarta',
@@ -84,6 +87,7 @@ let nowSpy: jest.SpyInstance<number, []>;
 beforeEach(() => {
   nowSpy = jest.spyOn(Date, 'now').mockReturnValue(NOW);
   mockGetForecast.mockReset();
+  mockOpenLink.mockReset();
   // the saved location is already read, unless a test says otherwise
   useLocationStore.setState({
     activeLocation: DEFAULT_LOCATION,
@@ -294,6 +298,22 @@ test('refresh turns isRefreshing on until the new forecast is in', async () => {
     expect(result.current).toMatchObject({ isRefreshing: false }),
   );
   expect(mockGetForecast).toHaveBeenCalledTimes(2);
+});
+
+test('credits Open-Meteo and opens its site', async () => {
+  mockGetForecast.mockResolvedValue(forecast);
+  const { wrapper } = setup();
+  const { result } = await renderHook(() => useWeatherViewModel(), { wrapper });
+  await waitFor(() => expect(result.current.status).toBe('success'));
+
+  if (result.current.status !== 'success') {
+    throw new Error('expected the success state');
+  }
+  expect(result.current.attribution).toBe('Weather data by Open-Meteo.com');
+  result.current.openAttribution();
+
+  expect(mockOpenLink).toHaveBeenCalledTimes(1);
+  expect(mockOpenLink).toHaveBeenCalledWith('https://open-meteo.com/');
 });
 
 test('asks for the saved units and shows the wind speed in them', async () => {
