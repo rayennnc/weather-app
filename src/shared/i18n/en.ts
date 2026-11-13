@@ -41,6 +41,15 @@ export const en = {
   'settings.title': 'Settings',
   'settings.temperature': 'Temperature',
   'settings.windSpeed': 'Wind speed',
+  'settings.about': 'About',
+
+  'about.title': 'About',
+  'about.weatherTitle': 'Weather data',
+  'about.weatherCredit': 'Weather data by Open-Meteo.com',
+  'about.weatherNote': 'Values are rounded and formatted for display.',
+  'about.placesTitle': 'Place names',
+  'about.placesCredit': 'Place names from GeoNames',
+  'about.license': 'Licensed under CC BY 4.0',
 
   'unit.celsius': '°C',
   'unit.fahrenheit': '°F',

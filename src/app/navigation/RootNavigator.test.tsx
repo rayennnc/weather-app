@@ -16,6 +16,10 @@ import {
   useSearchViewModel,
 } from '../../features/search/hooks/useSearchViewModel';
 import {
+  type AboutViewModel,
+  useAboutViewModel,
+} from '../../features/settings/hooks/useAboutViewModel';
+import {
   type SettingsViewModel,
   useSettingsViewModel,
 } from '../../features/settings/hooks/useSettingsViewModel';
@@ -29,10 +33,12 @@ jest.mock('../../features/weather/hooks/useWeatherViewModel');
 jest.mock('../../features/search/hooks/useSearchViewModel');
 jest.mock('../../features/locations/hooks/useLocationsViewModel');
 jest.mock('../../features/settings/hooks/useSettingsViewModel');
+jest.mock('../../features/settings/hooks/useAboutViewModel');
 const mockWeather = jest.mocked(useWeatherViewModel);
 const mockSearch = jest.mocked(useSearchViewModel);
 const mockLocations = jest.mocked(useLocationsViewModel);
 const mockSettings = jest.mocked(useSettingsViewModel);
+const mockAbout = jest.mocked(useAboutViewModel);
 
 const searchViewModel: SearchViewModel = {
   query: 'Ban',
@@ -74,6 +80,21 @@ const settingsViewModel: SettingsViewModel = {
   selectWindSpeed: jest.fn(),
 };
 
+const aboutViewModel: AboutViewModel = {
+  sources: [
+    {
+      id: 'weather',
+      title: 'Weather data',
+      credit: 'Weather data by Open-Meteo.com',
+      creditUrl: 'https://open-meteo.com/',
+      license: 'Licensed under CC BY 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
+      note: null,
+    },
+  ],
+  openLink: jest.fn(),
+};
+
 beforeEach(() => {
   mockWeather.mockReturnValue({
     status: 'error',
@@ -83,6 +104,7 @@ beforeEach(() => {
   mockSearch.mockReturnValue(searchViewModel);
   mockLocations.mockReturnValue(locationsViewModel);
   mockSettings.mockReturnValue(settingsViewModel);
+  mockAbout.mockReturnValue(aboutViewModel);
 });
 
 const renderNavigator = () =>
@@ -206,4 +228,16 @@ test('choosing a unit in the settings keeps the settings screen open', async () 
 
   expect(selectTemperature).toHaveBeenCalledWith('fahrenheit');
   expect(screen.getByText(t('settings.temperature'))).toBeOnTheScreen();
+});
+
+test('the about row in the settings opens the about screen', async () => {
+  await renderNavigator();
+  await fireEvent.press(screen.getByText(t('weather.settings')));
+  expect(
+    screen.queryByText(aboutViewModel.sources[0].credit),
+  ).not.toBeOnTheScreen();
+
+  await fireEvent.press(screen.getByText(t('settings.about')));
+
+  expect(screen.getByText(aboutViewModel.sources[0].credit)).toBeOnTheScreen();
 });

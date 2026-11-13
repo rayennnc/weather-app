@@ -28,10 +28,13 @@ function viewModel(
   };
 }
 
+const renderScreen = (onAboutPress = jest.fn()) =>
+  render(<SettingsScreen onAboutPress={onAboutPress} />);
+
 test('shows a heading and the choices of each setting', async () => {
   mockViewModel.mockReturnValue(viewModel());
 
-  await render(<SettingsScreen />);
+  await renderScreen();
 
   expect(screen.getByText(t('settings.temperature'))).toBeOnTheScreen();
   expect(screen.getByText(t('settings.windSpeed'))).toBeOnTheScreen();
@@ -45,7 +48,7 @@ test('shows a heading and the choices of each setting', async () => {
 test('groups the choices of a setting under its name', async () => {
   mockViewModel.mockReturnValue(viewModel());
 
-  await render(<SettingsScreen />);
+  await renderScreen();
 
   // the group is not an accessibility element itself, or a screen reader would
   // swallow the choices inside it. so it is found by its label, not by its role
@@ -69,7 +72,7 @@ test('marks only the selected choice of each setting', async () => {
     }),
   );
 
-  await render(<SettingsScreen />);
+  await renderScreen();
 
   expect(
     screen.getByRole('radio', { name: '°F', checked: true }),
@@ -92,7 +95,7 @@ test('choosing a temperature unit reports it', async () => {
     viewModel({ selectTemperature, selectWindSpeed }),
   );
 
-  await render(<SettingsScreen />);
+  await renderScreen();
   await fireEvent.press(screen.getByText('°F'));
 
   expect(selectTemperature).toHaveBeenCalledWith('fahrenheit');
@@ -106,9 +109,21 @@ test('choosing a wind speed unit reports it', async () => {
     viewModel({ selectTemperature, selectWindSpeed }),
   );
 
-  await render(<SettingsScreen />);
+  await renderScreen();
   await fireEvent.press(screen.getByText('mph'));
 
   expect(selectWindSpeed).toHaveBeenCalledWith('mph');
   expect(selectTemperature).not.toHaveBeenCalled();
+});
+
+test('the about row reports a press', async () => {
+  const onAboutPress = jest.fn();
+  mockViewModel.mockReturnValue(viewModel());
+
+  await renderScreen(onAboutPress);
+  await fireEvent.press(
+    screen.getByRole('button', { name: t('settings.about') }),
+  );
+
+  expect(onAboutPress).toHaveBeenCalledTimes(1);
 });
