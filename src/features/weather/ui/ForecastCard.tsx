@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../../shared/theme/colors';
+import type { Colors } from '../../../shared/theme/palettes';
+import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 
 type Props = {
   title: string;
@@ -8,6 +9,7 @@ type Props = {
 };
 
 export function ForecastCard({ title, children }: Props) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.card}>
       <Text accessibilityRole="header" style={styles.title}>
@@ -18,16 +20,18 @@ export function ForecastCard({ title, children }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.card,
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
-  },
-  title: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    card: {
+      backgroundColor: colors.card,
+      borderRadius: 16,
+      padding: 16,
+      gap: 12,
+    },
+    title: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+  });
+}

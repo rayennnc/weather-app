@@ -8,7 +8,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useT } from '../../../shared/i18n/useT';
-import { colors } from '../../../shared/theme/colors';
+import type { Colors } from '../../../shared/theme/palettes';
+import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import {
   useWeatherViewModel,
   type WeatherScreenState,
@@ -31,6 +32,7 @@ export function WeatherScreen({
   onSettingsPress,
 }: Props) {
   const t = useT();
+  const styles = useThemedStyles(createStyles);
   const state = useWeatherViewModel();
 
   return (
@@ -68,6 +70,7 @@ export function WeatherScreen({
 
 function WeatherContent({ state }: { state: WeatherScreenState }) {
   const t = useT();
+  const styles = useThemedStyles(createStyles);
 
   switch (state.status) {
     case 'loading':
@@ -117,72 +120,74 @@ function WeatherContent({ state }: { state: WeatherScreenState }) {
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  topBar: {
-    flexDirection: 'row',
-    // a large font can make the buttons too wide for one row
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-  topButtons: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  topButton: {
-    minHeight: 44,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-    borderRadius: 22,
-    backgroundColor: colors.card,
-  },
-  topButtonText: {
-    color: colors.accent,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-    gap: 12,
-  },
-  scroll: {
-    padding: 16,
-    gap: 16,
-  },
-  attribution: {
-    minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  attributionText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textDecorationLine: 'underline',
-  },
-  message: {
-    fontSize: 16,
-    color: colors.text,
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: colors.onAccent,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    topBar: {
+      flexDirection: 'row',
+      // a large font can make the buttons too wide for one row
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      gap: 8,
+      paddingHorizontal: 16,
+      paddingTop: 8,
+    },
+    topButtons: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    topButton: {
+      minHeight: 44,
+      justifyContent: 'center',
+      paddingHorizontal: 16,
+      borderRadius: 22,
+      backgroundColor: colors.card,
+    },
+    topButtonText: {
+      color: colors.accent,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    center: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 24,
+      gap: 12,
+    },
+    scroll: {
+      padding: 16,
+      gap: 16,
+    },
+    attribution: {
+      minHeight: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    attributionText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+      textDecorationLine: 'underline',
+    },
+    message: {
+      fontSize: 16,
+      color: colors.text,
+      textAlign: 'center',
+    },
+    button: {
+      backgroundColor: colors.accent,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderRadius: 8,
+    },
+    buttonText: {
+      color: colors.onAccent,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+  });
+}
