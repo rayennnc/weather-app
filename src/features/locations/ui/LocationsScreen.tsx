@@ -8,7 +8,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useT } from '../../../shared/i18n/useT';
-import { colors } from '../../../shared/theme/colors';
+import type { Colors } from '../../../shared/theme/palettes';
+import { useColors } from '../../../shared/theme/useColors';
+import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import type { Place } from '../../../shared/types/place';
 import {
   type MyLocationState,
@@ -24,6 +26,8 @@ type Props = {
 
 export function LocationsScreen({ onAddPress, onLocationSelected }: Props) {
   const t = useT();
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   const {
     locations,
     canRemove,
@@ -124,6 +128,7 @@ type MessageProps = {
 // why "use my location" did not work, and what to do next
 function MyLocationMessage({ myLocation, onOpenSettings }: MessageProps) {
   const t = useT();
+  const styles = useThemedStyles(createStyles);
 
   if (myLocation.status === 'idle' || myLocation.status === 'locating') {
     return null;
@@ -148,99 +153,101 @@ function MyLocationMessage({ myLocation, onOpenSettings }: MessageProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 16,
-    gap: 12,
-  },
-  actions: {
-    gap: 8,
-  },
-  primaryButton: {
-    minHeight: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: colors.accent,
-    borderRadius: 12,
-  },
-  busy: {
-    opacity: 0.7,
-  },
-  primaryButtonText: {
-    color: colors.onAccent,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  secondaryButton: {
-    minHeight: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 12,
-  },
-  secondaryButtonText: {
-    color: colors.accent,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  message: {
-    gap: 4,
-    paddingHorizontal: 4,
-  },
-  messageText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  settingsButton: {
-    alignSelf: 'flex-start',
-    minHeight: 44,
-    justifyContent: 'center',
-  },
-  settingsButtonText: {
-    color: colors.accent,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  list: {
-    gap: 8,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
-    borderRadius: 12,
-  },
-  rowMain: {
-    flex: 1,
-    padding: 16,
-    gap: 2,
-  },
-  rowTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  rowSubtitle: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  activeLabel: {
-    marginTop: 4,
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.accent,
-  },
-  removeButton: {
-    minHeight: 48,
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  removeText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 16,
+      gap: 12,
+    },
+    actions: {
+      gap: 8,
+    },
+    primaryButton: {
+      minHeight: 48,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: colors.accent,
+      borderRadius: 12,
+    },
+    busy: {
+      opacity: 0.7,
+    },
+    primaryButtonText: {
+      color: colors.onAccent,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    secondaryButton: {
+      minHeight: 48,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.card,
+      borderRadius: 12,
+    },
+    secondaryButtonText: {
+      color: colors.accent,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    message: {
+      gap: 4,
+      paddingHorizontal: 4,
+    },
+    messageText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    settingsButton: {
+      alignSelf: 'flex-start',
+      minHeight: 44,
+      justifyContent: 'center',
+    },
+    settingsButtonText: {
+      color: colors.accent,
+      fontSize: 15,
+      fontWeight: '600',
+    },
+    list: {
+      gap: 8,
+    },
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.card,
+      borderRadius: 12,
+    },
+    rowMain: {
+      flex: 1,
+      padding: 16,
+      gap: 2,
+    },
+    rowTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    rowSubtitle: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    activeLabel: {
+      marginTop: 4,
+      fontSize: 13,
+      fontWeight: '600',
+      color: colors.accent,
+    },
+    removeButton: {
+      minHeight: 48,
+      justifyContent: 'center',
+      paddingHorizontal: 16,
+    },
+    removeText: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+  });
+}
