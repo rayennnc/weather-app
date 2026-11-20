@@ -10,7 +10,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useT } from '../../../shared/i18n/useT';
 import type { Place } from '../../../shared/types/place';
-import { colors } from '../../../shared/theme/colors';
+import type { Colors } from '../../../shared/theme/palettes';
+import { useColors } from '../../../shared/theme/useColors';
+import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import {
   type SearchState,
   useSearchViewModel,
@@ -23,6 +25,8 @@ type Props = {
 
 export function SearchScreen({ onPlaceSelected }: Props) {
   const t = useT();
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
   const { query, setQuery, state, selectPlace } = useSearchViewModel();
 
   function handleSelect(id: Place['id']) {
@@ -56,6 +60,8 @@ type ResultsProps = {
 
 function SearchResults({ state, onSelect }: ResultsProps) {
   const t = useT();
+  const colors = useColors();
+  const styles = useThemedStyles(createStyles);
 
   switch (state.status) {
     case 'idle':
@@ -109,62 +115,64 @@ function SearchResults({ state, onSelect }: ResultsProps) {
   }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 16,
-    gap: 12,
-  },
-  input: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: colors.text,
-  },
-  message: {
-    fontSize: 16,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    paddingTop: 12,
-  },
-  spinner: {
-    paddingTop: 24,
-  },
-  center: {
-    alignItems: 'center',
-    paddingTop: 12,
-    gap: 12,
-  },
-  button: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  buttonText: {
-    color: colors.onAccent,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  list: {
-    gap: 8,
-  },
-  row: {
-    backgroundColor: colors.card,
-    borderRadius: 12,
-    padding: 16,
-    gap: 2,
-  },
-  rowTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  rowSubtitle: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 16,
+      gap: 12,
+    },
+    input: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      fontSize: 16,
+      color: colors.text,
+    },
+    message: {
+      fontSize: 16,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      paddingTop: 12,
+    },
+    spinner: {
+      paddingTop: 24,
+    },
+    center: {
+      alignItems: 'center',
+      paddingTop: 12,
+      gap: 12,
+    },
+    button: {
+      backgroundColor: colors.accent,
+      paddingHorizontal: 20,
+      paddingVertical: 12,
+      borderRadius: 8,
+    },
+    buttonText: {
+      color: colors.onAccent,
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    list: {
+      gap: 8,
+    },
+    row: {
+      backgroundColor: colors.card,
+      borderRadius: 12,
+      padding: 16,
+      gap: 2,
+    },
+    rowTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    rowSubtitle: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+  });
+}
