@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useT } from '../../../shared/i18n/useT';
-import { colors } from '../../../shared/theme/colors';
+import type { Colors } from '../../../shared/theme/palettes';
+import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import type { DayView } from '../hooks/forecastView';
 import { ForecastCard } from './ForecastCard';
 import { WeatherIcon } from './WeatherIcon';
@@ -11,6 +12,7 @@ type Props = {
 
 export function DailyForecast({ days }: Props) {
   const t = useT();
+  const styles = useThemedStyles(createStyles);
 
   return (
     <ForecastCard title={t('weather.dailyTitle')}>
@@ -27,33 +29,35 @@ export function DailyForecast({ days }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  day: {
-    width: 56,
-    fontSize: 16,
-    color: colors.text,
-  },
-  chance: {
-    flex: 1,
-    fontSize: 12,
-    color: colors.accent,
-  },
-  max: {
-    width: 40,
-    fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'right',
-    color: colors.text,
-  },
-  min: {
-    width: 40,
-    fontSize: 16,
-    textAlign: 'right',
-    color: colors.textSecondary,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    day: {
+      width: 56,
+      fontSize: 16,
+      color: colors.text,
+    },
+    chance: {
+      flex: 1,
+      fontSize: 12,
+      color: colors.accent,
+    },
+    max: {
+      width: 40,
+      fontSize: 16,
+      fontWeight: '600',
+      textAlign: 'right',
+      color: colors.text,
+    },
+    min: {
+      width: 40,
+      fontSize: 16,
+      textAlign: 'right',
+      color: colors.textSecondary,
+    },
+  });
+}

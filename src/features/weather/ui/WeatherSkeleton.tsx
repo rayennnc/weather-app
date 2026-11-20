@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View, type DimensionValue } from 'react-native';
 import { useT } from '../../../shared/i18n/useT';
-import { colors } from '../../../shared/theme/colors';
+import { useColors } from '../../../shared/theme/useColors';
 
 // one value drives the whole skeleton: it fades between half and full opacity
 function usePulse() {
@@ -36,13 +36,15 @@ type BoxProps = {
 };
 
 function Box({ width, height, radius = 8 }: BoxProps) {
+  const { skeleton } = useColors();
+
   return (
     <View
       style={{
         width,
         height,
         borderRadius: radius,
-        backgroundColor: colors.skeleton,
+        backgroundColor: skeleton,
       }}
     />
   );

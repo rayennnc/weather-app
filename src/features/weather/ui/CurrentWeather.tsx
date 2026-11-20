@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../../shared/theme/colors';
+import type { Colors } from '../../../shared/theme/palettes';
+import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import type { CurrentView } from '../hooks/forecastView';
 import { WeatherIcon } from './WeatherIcon';
 
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export function CurrentWeather({ location, current, updated }: Props) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View style={styles.container}>
       <Text style={styles.location}>{location}</Text>
@@ -26,32 +28,34 @@ export function CurrentWeather({ location, current, updated }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 24,
-  },
-  location: {
-    fontSize: 28,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  temperature: {
-    fontSize: 72,
-    fontWeight: '300',
-    color: colors.text,
-  },
-  condition: {
-    fontSize: 22,
-    color: colors.text,
-  },
-  secondary: {
-    fontSize: 16,
-    color: colors.textSecondary,
-  },
-  updated: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: {
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 24,
+    },
+    location: {
+      fontSize: 28,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    temperature: {
+      fontSize: 72,
+      fontWeight: '300',
+      color: colors.text,
+    },
+    condition: {
+      fontSize: 22,
+      color: colors.text,
+    },
+    secondary: {
+      fontSize: 16,
+      color: colors.textSecondary,
+    },
+    updated: {
+      fontSize: 12,
+      color: colors.textSecondary,
+    },
+  });
+}

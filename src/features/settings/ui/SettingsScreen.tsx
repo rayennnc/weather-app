@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useT } from '../../../shared/i18n/useT';
-import { colors } from '../../../shared/theme/colors';
+import type { Colors } from '../../../shared/theme/palettes';
+import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import { useSettingsViewModel } from '../hooks/useSettingsViewModel';
 import { SegmentedControl } from './SegmentedControl';
 
@@ -12,6 +13,7 @@ type Props = {
 
 export function SettingsScreen({ onAboutPress }: Props) {
   const t = useT();
+  const styles = useThemedStyles(createStyles);
   const {
     temperatureOptions,
     windSpeedOptions,
@@ -56,37 +58,39 @@ export function SettingsScreen({ onAboutPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: 16,
-    gap: 24,
-  },
-  setting: {
-    gap: 8,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  row: {
-    minHeight: 48,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    backgroundColor: colors.card,
-    borderRadius: 12,
-  },
-  rowText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  arrow: {
-    fontSize: 20,
-    color: colors.textSecondary,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: 16,
+      gap: 24,
+    },
+    setting: {
+      gap: 8,
+    },
+    title: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    row: {
+      minHeight: 48,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 16,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+    },
+    rowText: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    arrow: {
+      fontSize: 20,
+      color: colors.textSecondary,
+    },
+  });
+}

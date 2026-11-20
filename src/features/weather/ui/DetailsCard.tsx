@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useT } from '../../../shared/i18n/useT';
-import { colors } from '../../../shared/theme/colors';
+import type { Colors } from '../../../shared/theme/palettes';
+import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import type { DetailView } from '../hooks/forecastView';
 import { ForecastCard } from './ForecastCard';
 
@@ -10,6 +11,7 @@ type Props = {
 
 export function DetailsCard({ details }: Props) {
   const t = useT();
+  const styles = useThemedStyles(createStyles);
 
   return (
     <ForecastCard title={t('weather.detailsTitle')}>
@@ -25,23 +27,25 @@ export function DetailsCard({ details }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  tile: {
-    width: '50%',
-    paddingVertical: 8,
-    gap: 2,
-  },
-  label: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  value: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: colors.text,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+    },
+    tile: {
+      width: '50%',
+      paddingVertical: 8,
+      gap: 2,
+    },
+    label: {
+      fontSize: 14,
+      color: colors.textSecondary,
+    },
+    value: {
+      fontSize: 20,
+      fontWeight: '600',
+      color: colors.text,
+    },
+  });
+}
