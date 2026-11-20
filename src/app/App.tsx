@@ -1,16 +1,19 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { navigationTheme } from './navigation/navigationTheme';
+import { useStatusBarStyle } from '../shared/theme/useStatusBarStyle';
+import { useNavigationTheme } from './navigation/navigationTheme';
 import { RootNavigator } from './navigation/RootNavigator';
 import { QueryProvider } from './providers/QueryProvider';
 
 function App() {
+  const statusBarStyle = useStatusBarStyle();
+  const navigationTheme = useNavigationTheme();
+
   return (
     <SafeAreaProvider>
       <QueryProvider>
-        {/* the screens are light only for now, so the status bar icons stay dark. dark mode is v1.1 */}
-        <StatusBar barStyle="dark-content" />
+        <StatusBar barStyle={statusBarStyle} />
         <NavigationContainer theme={navigationTheme}>
           <RootNavigator />
         </NavigationContainer>
