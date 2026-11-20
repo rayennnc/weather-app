@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { colors } from '../../../shared/theme/colors';
+import type { Colors } from '../../../shared/theme/palettes';
+import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import type { UnitOption } from '../hooks/useSettingsViewModel';
 
 type Props<Value extends string> = {
@@ -15,6 +16,7 @@ export function SegmentedControl<Value extends string>({
   options,
   onSelect,
 }: Props<Value>) {
+  const styles = useThemedStyles(createStyles);
   return (
     <View
       accessibilityLabel={label}
@@ -38,30 +40,32 @@ export function SegmentedControl<Value extends string>({
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    gap: 4,
-    padding: 4,
-    backgroundColor: colors.card,
-    borderRadius: 12,
-  },
-  segment: {
-    flex: 1,
-    minHeight: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-  },
-  selected: {
-    backgroundColor: colors.accent,
-  },
-  text: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  selectedText: {
-    color: colors.onAccent,
-  },
-});
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      gap: 4,
+      padding: 4,
+      backgroundColor: colors.card,
+      borderRadius: 12,
+    },
+    segment: {
+      flex: 1,
+      minHeight: 44,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 8,
+    },
+    selected: {
+      backgroundColor: colors.accent,
+    },
+    text: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.text,
+    },
+    selectedText: {
+      color: colors.onAccent,
+    },
+  });
+}
