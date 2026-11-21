@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from '@testing-library/react-native';
 import type { ComponentProps } from 'react';
 import { t } from '../../../shared/i18n/useT';
 import {
@@ -18,6 +24,10 @@ const renderScreen = (
       {...props}
     />,
   );
+
+// the buttons show only an icon, so they are found by the name a screen reader says
+const topButton = (name: 'locations' | 'search' | 'settings') =>
+  screen.getByRole('button', { name: t(`weather.${name}`) });
 
 // the screen only draws what the view model gives it, so the view model is mocked
 jest.mock('../hooks/useWeatherViewModel');
@@ -150,6 +160,21 @@ test('shows the spinner while refreshing', async () => {
   expect(refreshControl.props.refreshing).toBe(true);
 });
 
+test.each([
+  ['locations', 'map-marker-outline'],
+  ['search', 'magnify'],
+  ['settings', 'cog-outline'],
+] as const)('the %s button shows the %s icon', async (name, icon) => {
+  mockViewModel.mockReturnValue(success);
+
+  await renderScreen();
+
+  expect(within(topButton(name)).getByTestId('top-button-icon')).toHaveProp(
+    'name',
+    icon,
+  );
+});
+
 const statesWithTheButtons: [string, WeatherScreenState][] = [
   ['the skeleton', { status: 'loading' }],
   ['an error', { status: 'error', message: 'No internet', retry: jest.fn() }],
@@ -165,9 +190,9 @@ test.each(statesWithTheButtons)(
     mockViewModel.mockReturnValue(state);
 
     await renderScreen({ onSearchPress, onLocationsPress, onSettingsPress });
-    await fireEvent.press(screen.getByText(t('weather.search')));
-    await fireEvent.press(screen.getByText(t('weather.locations')));
-    await fireEvent.press(screen.getByText(t('weather.settings')));
+    await fireEvent.press(topButton('search'));
+    await fireEvent.press(topButton('locations'));
+    await fireEvent.press(topButton('settings'));
 
     expect(onSearchPress).toHaveBeenCalledTimes(1);
     expect(onLocationsPress).toHaveBeenCalledTimes(1);
