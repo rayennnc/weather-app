@@ -10,7 +10,7 @@ beforeEach(() => {
 });
 
 // the addresses are what the licenses ask for, so they are pinned here
-test('credits Open-Meteo and GeoNames, each with its address and license', async () => {
+test('credits Open-Meteo, GeoNames and the icons, each with its address and license', async () => {
   const { result } = await renderHook(() => useAboutViewModel());
 
   expect(result.current.sources).toEqual([
@@ -30,6 +30,15 @@ test('credits Open-Meteo and GeoNames, each with its address and license', async
       creditUrl: 'https://www.geonames.org/',
       license: 'Licensed under CC BY 4.0',
       licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
+      note: null,
+    },
+    {
+      id: 'icons',
+      title: 'Icons',
+      credit: 'Material Design Icons by Pictogrammers',
+      creditUrl: 'https://pictogrammers.com/library/mdi/',
+      license: 'Licensed under Apache 2.0',
+      licenseUrl: 'https://www.apache.org/licenses/LICENSE-2.0',
       note: null,
     },
   ]);

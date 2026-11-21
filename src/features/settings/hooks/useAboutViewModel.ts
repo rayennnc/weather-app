@@ -1,16 +1,18 @@
 import { useT } from '../../../shared/i18n/useT';
 import {
+  APACHE_LICENSE_URL,
   GEONAMES_URL,
   LICENSE_URL,
+  MDI_URL,
   OPEN_METEO_URL,
 } from '../../../shared/lib/dataSources';
 import { openLink } from '../../../shared/lib/openLink';
 
-// one source of data, ready to draw
+// one source that has to be credited (data or icons), ready to draw
 export type SourceView = {
-  id: 'weather' | 'places';
+  id: 'weather' | 'places' | 'icons';
   title: string;
-  credit: string; // the credit that Open-Meteo and GeoNames ask for
+  credit: string; // the credit that the source asks for
   creditUrl: string;
   license: string;
   licenseUrl: string;
@@ -43,6 +45,15 @@ export function useAboutViewModel(): AboutViewModel {
         creditUrl: GEONAMES_URL,
         license: t('about.license'),
         licenseUrl: LICENSE_URL,
+        note: null,
+      },
+      {
+        id: 'icons',
+        title: t('about.iconsTitle'),
+        credit: t('about.iconsCredit'),
+        creditUrl: MDI_URL,
+        license: t('about.iconsLicense'),
+        licenseUrl: APACHE_LICENSE_URL,
         note: null,
       },
     ],
