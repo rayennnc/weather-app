@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react-native';
+import { render, screen, within } from '@testing-library/react-native';
 import { useColorScheme } from 'react-native';
 import { t } from '../../../shared/i18n/useT';
 import { darkColors, lightColors } from '../../../shared/theme/palettes';
@@ -53,17 +53,18 @@ describe.each([
     mockColorScheme.mockReturnValue(scheme);
   });
 
-  test('the top buttons are cards with accent text', async () => {
+  test('the top buttons are cards with accent icons', async () => {
     mockViewModel.mockReturnValue(success);
 
     await renderScreen();
 
     for (const name of ['locations', 'search', 'settings'] as const) {
-      const label = t(`weather.${name}`);
-      expect(screen.getByRole('button', { name: label })).toHaveStyle({
-        backgroundColor: palette.card,
-      });
-      expect(screen.getByText(label)).toHaveStyle({ color: palette.accent });
+      const button = screen.getByRole('button', { name: t(`weather.${name}`) });
+      expect(button).toHaveStyle({ backgroundColor: palette.card });
+      expect(within(button).getByTestId('top-button-icon')).toHaveProp(
+        'color',
+        palette.accent,
+      );
     }
   });
 

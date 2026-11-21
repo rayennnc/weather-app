@@ -1,4 +1,8 @@
 import {
+  MaterialDesignIcons,
+  type MaterialDesignIconsIconName,
+} from '@react-native-vector-icons/material-design-icons/static';
+import {
   Pressable,
   RefreshControl,
   ScrollView,
@@ -9,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useT } from '../../../shared/i18n/useT';
 import type { Colors } from '../../../shared/theme/palettes';
+import { useColors } from '../../../shared/theme/useColors';
 import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import {
   useWeatherViewModel,
@@ -39,32 +44,54 @@ export function WeatherScreen({
     <SafeAreaView style={styles.container}>
       {/* outside WeatherContent, so a failed forecast still lets the user pick another city */}
       <View style={styles.topBar}>
-        <Pressable
-          accessibilityRole="button"
+        <TopButton
+          icon="map-marker-outline"
+          label={t('weather.locations')}
           onPress={onLocationsPress}
-          style={styles.topButton}
-        >
-          <Text style={styles.topButtonText}>{t('weather.locations')}</Text>
-        </Pressable>
+        />
         <View style={styles.topButtons}>
-          <Pressable
-            accessibilityRole="button"
+          <TopButton
+            icon="magnify"
+            label={t('weather.search')}
             onPress={onSearchPress}
-            style={styles.topButton}
-          >
-            <Text style={styles.topButtonText}>{t('weather.search')}</Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
+          />
+          <TopButton
+            icon="cog-outline"
+            label={t('weather.settings')}
             onPress={onSettingsPress}
-            style={styles.topButton}
-          >
-            <Text style={styles.topButtonText}>{t('weather.settings')}</Text>
-          </Pressable>
+          />
         </View>
       </View>
       <WeatherContent state={state} />
     </SafeAreaView>
+  );
+}
+
+type TopButtonProps = {
+  icon: MaterialDesignIconsIconName;
+  label: string;
+  onPress: () => void;
+};
+
+// shows only an icon, so the label is what a screen reader says
+function TopButton({ icon, label, onPress }: TopButtonProps) {
+  const styles = useThemedStyles(createStyles);
+  const { accent } = useColors();
+
+  return (
+    <Pressable
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      onPress={onPress}
+      style={styles.topButton}
+    >
+      <MaterialDesignIcons
+        name={icon}
+        size={24}
+        color={accent}
+        testID="top-button-icon"
+      />
+    </Pressable>
   );
 }
 
@@ -128,8 +155,6 @@ function createStyles(colors: Colors) {
     },
     topBar: {
       flexDirection: 'row',
-      // a large font can make the buttons too wide for one row
-      flexWrap: 'wrap',
       justifyContent: 'space-between',
       gap: 8,
       paddingHorizontal: 16,
@@ -137,20 +162,15 @@ function createStyles(colors: Colors) {
     },
     topButtons: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
       gap: 8,
     },
     topButton: {
-      minHeight: 44,
+      width: 48,
+      height: 48,
+      alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: 16,
-      borderRadius: 22,
+      borderRadius: 24,
       backgroundColor: colors.card,
-    },
-    topButtonText: {
-      color: colors.accent,
-      fontSize: 16,
-      fontWeight: '600',
     },
     center: {
       flex: 1,

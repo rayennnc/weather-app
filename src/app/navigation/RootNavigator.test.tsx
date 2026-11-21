@@ -117,6 +117,9 @@ const renderNavigator = () =>
 const searchInput = () =>
   screen.queryByPlaceholderText(t('search.placeholder'));
 const addButton = () => screen.queryByText(t('locations.add'));
+// the buttons show only an icon, so they are found by the name a screen reader says
+const topButton = (name: 'search' | 'locations' | 'settings') =>
+  screen.getByRole('button', { name: t(`weather.${name}`) });
 
 test('starts on the weather screen, not on the others', async () => {
   await renderNavigator();
@@ -129,7 +132,7 @@ test('starts on the weather screen, not on the others', async () => {
 test('the search button opens the search screen', async () => {
   await renderNavigator();
 
-  await fireEvent.press(screen.getByText(t('weather.search')));
+  await fireEvent.press(topButton('search'));
 
   expect(searchInput()).toBeOnTheScreen();
 });
@@ -138,7 +141,7 @@ test('choosing a place in the search selects it and goes back to the weather', a
   const selectPlace = jest.fn();
   mockSearch.mockReturnValue({ ...searchViewModel, selectPlace });
   await renderNavigator();
-  await fireEvent.press(screen.getByText(t('weather.search')));
+  await fireEvent.press(topButton('search'));
 
   await fireEvent.press(screen.getByText('West Java, Indonesia'));
 
@@ -150,7 +153,7 @@ test('choosing a place in the search selects it and goes back to the weather', a
 test('the locations button opens the locations screen', async () => {
   await renderNavigator();
 
-  await fireEvent.press(screen.getByText(t('weather.locations')));
+  await fireEvent.press(topButton('locations'));
 
   expect(addButton()).toBeOnTheScreen();
   expect(screen.getByText('Surabaya')).toBeOnTheScreen();
@@ -160,7 +163,7 @@ test('choosing a saved place selects it and goes back to the weather', async () 
   const selectLocation = jest.fn();
   mockLocations.mockReturnValue({ ...locationsViewModel, selectLocation });
   await renderNavigator();
-  await fireEvent.press(screen.getByText(t('weather.locations')));
+  await fireEvent.press(topButton('locations'));
 
   await fireEvent.press(screen.getByText('Surabaya'));
 
@@ -171,7 +174,7 @@ test('choosing a saved place selects it and goes back to the weather', async () 
 
 test('adding a city from the locations goes to the search and then straight back to the weather', async () => {
   await renderNavigator();
-  await fireEvent.press(screen.getByText(t('weather.locations')));
+  await fireEvent.press(topButton('locations'));
   await fireEvent.press(screen.getByText(t('locations.add')));
   expect(searchInput()).toBeOnTheScreen();
 
@@ -187,7 +190,7 @@ test('finding my location from the locations goes straight back to the weather',
   const locateMe = jest.fn().mockResolvedValue(true);
   mockLocations.mockReturnValue({ ...locationsViewModel, locateMe });
   await renderNavigator();
-  await fireEvent.press(screen.getByText(t('weather.locations')));
+  await fireEvent.press(topButton('locations'));
 
   await fireEvent.press(screen.getByText(t('locations.useMyLocation')));
 
@@ -200,7 +203,7 @@ test('when my location cannot be found, the locations screen stays open', async 
   const locateMe = jest.fn().mockResolvedValue(false);
   mockLocations.mockReturnValue({ ...locationsViewModel, locateMe });
   await renderNavigator();
-  await fireEvent.press(screen.getByText(t('weather.locations')));
+  await fireEvent.press(topButton('locations'));
 
   await fireEvent.press(screen.getByText(t('locations.useMyLocation')));
 
@@ -212,7 +215,7 @@ test('the settings button opens the settings screen', async () => {
   await renderNavigator();
   expect(screen.queryByText(t('settings.temperature'))).not.toBeOnTheScreen();
 
-  await fireEvent.press(screen.getByText(t('weather.settings')));
+  await fireEvent.press(topButton('settings'));
 
   expect(screen.getByText(t('settings.temperature'))).toBeOnTheScreen();
   expect(screen.getByText(t('settings.windSpeed'))).toBeOnTheScreen();
@@ -222,7 +225,7 @@ test('choosing a unit in the settings keeps the settings screen open', async () 
   const selectTemperature = jest.fn();
   mockSettings.mockReturnValue({ ...settingsViewModel, selectTemperature });
   await renderNavigator();
-  await fireEvent.press(screen.getByText(t('weather.settings')));
+  await fireEvent.press(topButton('settings'));
 
   await fireEvent.press(screen.getByText('°F'));
 
@@ -232,7 +235,7 @@ test('choosing a unit in the settings keeps the settings screen open', async () 
 
 test('the about row in the settings opens the about screen', async () => {
   await renderNavigator();
-  await fireEvent.press(screen.getByText(t('weather.settings')));
+  await fireEvent.press(topButton('settings'));
   expect(
     screen.queryByText(aboutViewModel.sources[0].credit),
   ).not.toBeOnTheScreen();
