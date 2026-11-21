@@ -7,6 +7,7 @@ import { DailyForecast } from './DailyForecast';
 import { DetailsCard } from './DetailsCard';
 import { ForecastCard } from './ForecastCard';
 import { HourlyForecast } from './HourlyForecast';
+import { WeatherIcon } from './WeatherIcon';
 import { WeatherSkeleton } from './WeatherSkeleton';
 
 // the Jest preset replaces useColorScheme with a mock, so a test decides which
@@ -106,6 +107,15 @@ describe.each([
       color: palette.textSecondary,
     });
     expect(screen.getByText('80%')).toHaveStyle({ color: palette.accent });
+  });
+
+  test('the weather icon has the main text color', async () => {
+    await render(<WeatherIcon condition="rain" isDay={false} />);
+
+    expect(screen.getByTestId('weather-icon')).toHaveProp(
+      'color',
+      palette.text,
+    );
   });
 
   test('the skeleton shapes have the skeleton color of the theme, and no other', async () => {
