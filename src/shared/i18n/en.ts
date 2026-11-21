@@ -50,6 +50,9 @@ export const en = {
   'about.weatherNote': 'Values are rounded and formatted for display.',
   'about.placesTitle': 'Place names',
   'about.placesCredit': 'Place names from GeoNames',
+  'about.iconsTitle': 'Icons',
+  'about.iconsCredit': 'Material Design Icons by Pictogrammers',
+  'about.iconsLicense': 'Licensed under Apache 2.0',
   'about.license': 'Licensed under CC BY 4.0',
 
   'unit.celsius': '°C',
