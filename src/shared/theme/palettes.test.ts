@@ -44,6 +44,8 @@ describe.each([
     ['accent', 'card'],
     ['accent', 'background'],
     ['onAccent', 'accent'],
+    ['danger', 'card'],
+    ['danger', 'background'],
   ];
 
   test('a card can be told apart from the screen behind it', () => {

@@ -6,6 +6,7 @@ export type Colors = {
   textSecondary: string;
   accent: string;
   onAccent: string;
+  danger: string;
   skeleton: string;
 };
 
@@ -16,6 +17,7 @@ export const lightColors: Colors = {
   textSecondary: '#4B5563',
   accent: '#2563EB',
   onAccent: '#FFFFFF',
+  danger: '#B91C1C',
   skeleton: '#D5DEE8',
 };
 
@@ -26,5 +28,6 @@ export const darkColors: Colors = {
   textSecondary: '#94A3B8',
   accent: '#60A5FA',
   onAccent: '#0F172A',
+  danger: '#F87171',
   skeleton: '#334155',
 };
