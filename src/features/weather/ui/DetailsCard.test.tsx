@@ -17,3 +17,13 @@ test('shows the title and every detail with its value', async () => {
   expect(screen.getByText('Sunrise')).toBeOnTheScreen();
   expect(screen.getByText('05:41')).toBeOnTheScreen();
 });
+
+test('each detail is one item for a screen reader, with its label and value', async () => {
+  await render(<DetailsCard details={details} />);
+
+  expect(screen.getByLabelText('Humidity, 70%')).toHaveProp('accessible', true);
+  expect(screen.getByLabelText('Sunrise, 05:41')).toHaveProp(
+    'accessible',
+    true,
+  );
+});

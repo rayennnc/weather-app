@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
-import { useT } from '../../../shared/i18n/useT';
+import { useT, type Translate } from '../../../shared/i18n/useT';
 import type { Colors } from '../../../shared/theme/palettes';
 import { useThemedStyles } from '../../../shared/theme/useThemedStyles';
 import type { DayView } from '../hooks/forecastView';
@@ -10,6 +10,23 @@ type Props = {
   days: DayView[];
 };
 
+// what a screen reader says for a day, in one go
+function describeDay(day: DayView, t: Translate) {
+  return [
+    day.label,
+    t(`condition.${day.condition}`),
+    t('weather.dayTemperatures', {
+      max: day.temperatureMax,
+      min: day.temperatureMin,
+    }),
+    day.precipitationChance === null
+      ? null
+      : t('weather.rainChance', { chance: day.precipitationChance }),
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
+
 export function DailyForecast({ days }: Props) {
   const t = useT();
   const styles = useThemedStyles(createStyles);
@@ -17,7 +34,12 @@ export function DailyForecast({ days }: Props) {
   return (
     <ForecastCard title={t('weather.dailyTitle')}>
       {days.map(day => (
-        <View key={day.date} style={styles.row}>
+        <View
+          key={day.date}
+          accessible
+          accessibilityLabel={describeDay(day, t)}
+          style={styles.row}
+        >
           <Text style={styles.day}>{day.label}</Text>
           <WeatherIcon condition={day.condition} isDay size={28} />
           <Text style={styles.chance}>{day.precipitationChance ?? ''}</Text>

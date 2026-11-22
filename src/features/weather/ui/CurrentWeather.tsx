@@ -12,8 +12,16 @@ type Props = {
 
 export function CurrentWeather({ location, current, updated }: Props) {
   const styles = useThemedStyles(createStyles);
+  // one stop for a screen reader instead of five
+  const summary = [
+    location,
+    current.temperature,
+    current.conditionText,
+    current.feelsLike,
+    updated,
+  ].join(', ');
   return (
-    <View style={styles.container}>
+    <View accessible accessibilityLabel={summary} style={styles.container}>
       <Text style={styles.location}>{location}</Text>
       <WeatherIcon
         condition={current.condition}
