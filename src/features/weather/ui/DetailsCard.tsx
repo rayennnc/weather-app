@@ -17,7 +17,12 @@ export function DetailsCard({ details }: Props) {
     <ForecastCard title={t('weather.detailsTitle')}>
       <View style={styles.grid}>
         {details.map(detail => (
-          <View key={detail.id} style={styles.tile}>
+          <View
+            key={detail.id}
+            accessible
+            accessibilityLabel={`${detail.label}, ${detail.value}`}
+            style={styles.tile}
+          >
             <Text style={styles.label}>{detail.label}</Text>
             <Text style={styles.value}>{detail.value}</Text>
           </View>

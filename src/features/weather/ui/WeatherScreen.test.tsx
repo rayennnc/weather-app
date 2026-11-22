@@ -113,6 +113,16 @@ test('shows the current weather, the hours, the days and the details', async () 
   expect(screen.getByText('9 km/h')).toBeOnTheScreen();
 });
 
+test('shows no hours card when every hour is over, and the rest of the forecast', async () => {
+  mockViewModel.mockReturnValue({ ...success, hourly: [] });
+
+  await renderScreen();
+
+  expect(screen.queryByText(t('weather.hourlyTitle'))).not.toBeOnTheScreen();
+  expect(screen.getByText(t('weather.dailyTitle'))).toBeOnTheScreen();
+  expect(screen.getByText(t('weather.detailsTitle'))).toBeOnTheScreen();
+});
+
 test('credits Open-Meteo under the forecast, as a link that opens its site', async () => {
   const openAttribution = jest.fn();
   mockViewModel.mockReturnValue({ ...success, openAttribution });

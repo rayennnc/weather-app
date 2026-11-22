@@ -38,6 +38,20 @@ test('shows the rain chance of a day', async () => {
   expect(screen.getByText('80%')).toBeOnTheScreen();
 });
 
+test('each day is one item for a screen reader, with its condition, temperatures and rain chance', async () => {
+  await render(<DailyForecast days={days} />);
+
+  const rainy = screen.getByLabelText(
+    'Today, Rain, High 32°, low 25°, 80% chance of rain',
+  );
+  expect(rainy).toHaveProp('accessible', true);
+  // a day without a rain chance does not say one
+  expect(screen.getByLabelText('Thu, Clear, High 33°, low 25°')).toHaveProp(
+    'accessible',
+    true,
+  );
+});
+
 test('shows the lowest temperature of every day', async () => {
   await render(<DailyForecast days={days} />);
 

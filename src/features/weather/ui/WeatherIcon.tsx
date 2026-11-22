@@ -50,7 +50,7 @@ type Props = {
 export function WeatherIcon({ condition, isDay, size = 24 }: Props) {
   const { text } = useColors();
   const icon = WEATHER_ICONS[condition];
-  // the condition text is always shown next to the icon, so screen readers skip it
+  // the row around the icon already says the condition, so screen readers skip it
   return (
     <MaterialDesignIcons
       name={isDay ? icon.day : icon.night}
