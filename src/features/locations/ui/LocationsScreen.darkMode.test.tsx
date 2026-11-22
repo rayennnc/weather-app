@@ -80,7 +80,7 @@ describe.each([
     expect(button.children[0]).toHaveProp('color', palette.onAccent);
   });
 
-  test('a place is a card with a main title, a quiet subtitle and an accent mark', async () => {
+  test('a place is a card with a main title, a quiet subtitle, an accent mark and a remove button in the danger color', async () => {
     mockViewModel.mockReturnValue(viewModel());
 
     await renderScreen();
@@ -93,7 +93,7 @@ describe.each([
       color: palette.accent,
     });
     expect(screen.getByText(t('locations.remove'))).toHaveStyle({
-      color: palette.textSecondary,
+      color: palette.danger,
     });
   });
 
