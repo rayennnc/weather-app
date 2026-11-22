@@ -247,7 +247,7 @@ function createStyles(colors: Colors) {
     },
     removeText: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: colors.danger,
     },
   });
 }
