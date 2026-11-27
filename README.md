@@ -123,7 +123,21 @@ cd android
 ./gradlew assembleRelease "-PreactNativeArchitectures=armeabi-v7a,arm64-v8a"
 ```
 
-On Windows PowerShell, use `.\gradlew`. The APK is written to `android/app/build/outputs/apk/release/app-release.apk`. It is signed with the standard Android debug key that comes with the React Native template, which is fine for a demo but not for the Play Store.
+On Windows PowerShell, use `.\gradlew`. The APK is written to `android/app/build/outputs/apk/release/app-release.apk`.
+
+### Signing
+
+From v1.0.1 on, the APKs on the Releases page are signed with the maintainer's private release key, which is not in this repository. Your own builds work without it: when no release key is configured, Gradle falls back to the standard debug key that comes with the React Native template. That is fine for testing, but not for distribution or the Play Store.
+
+To sign with your own key, create a keystore outside the repository and add these properties to `~/.gradle/gradle.properties`, never to the project:
+
+```properties
+WEATHERAPP_RELEASE_STORE_FILE=/path/to/your-release.jks
+WEATHERAPP_RELEASE_KEY_ALIAS=your-key-alias
+WEATHERAPP_RELEASE_PASSWORD=your-password
+```
+
+The same password is used for the keystore and the key, which is the default for PKCS12 keystores. Back the keystore up: without it you cannot publish updates that existing installs will accept. An APK signed with a different key cannot be installed over an older one, so uninstall the previous version first.
 
 ## Data sources and credits
 
