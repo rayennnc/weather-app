@@ -77,3 +77,6 @@ yarn-error.log
 # JVM crash logs
 hs_err_pid*.log
 replay_pid*.log
+
+# private signing keys (the release key lives outside the repo)
+*.jks
